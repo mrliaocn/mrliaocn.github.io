@@ -91,7 +91,7 @@
 <meta name="keywords" content="Spark">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Spark集群配置（4）：其他填坑杂项">
-<meta property="og:url" content="http://127.0.0.1:4000/2017/03/16/Spark集群配置（4）：其他填坑杂项/index.html">
+<meta property="og:url" content="http://mrliao.cn/2017/03/16/Spark集群配置（4）：其他填坑杂项/index.html">
 <meta property="og:site_name" content="Mr. Liao">
 <meta property="og:description" content="前言本文是《Spark集群配置》的第四篇。主要讲解使用Spark集群时的一些小坑。其他的几篇传送门： . Spark集群配置（1）：基础配置. Spark集群配置（2）：安装Hadoop. Spark集群配置（3）：安装Spark hadoop native lib 问题在使用Hadoop和Spark时，有时候会出现这样一条警告：1WARN org.apache.hadoop.util.Nativ">
 <meta property="og:locale" content="zh-Hans">
@@ -126,7 +126,7 @@
 
 
 
-  <link rel="canonical" href="http://127.0.0.1:4000/2017/03/16/Spark集群配置（4）：其他填坑杂项/"/>
+  <link rel="canonical" href="http://mrliao.cn/2017/03/16/Spark集群配置（4）：其他填坑杂项/"/>
 
 
 
@@ -261,7 +261,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://127.0.0.1:4000/2017/03/16/Spark集群配置（4）：其他填坑杂项/">
+    <link itemprop="mainEntityOfPage" href="http://mrliao.cn/2017/03/16/Spark集群配置（4）：其他填坑杂项/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="LIAO">
@@ -334,10 +334,10 @@
 
       
         <h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>本文是《Spark集群配置》的第四篇。主要讲解使用<code>Spark</code>集群时的一些小坑。其他的几篇传送门：</p>
-<p>. <a href="http://mrliao.cn/2017/03/16/Spark集群配置（1）：基础配置" target="_blank" rel="external">Spark集群配置（1）：基础配置</a><br>. <a href="http://mrliao.cn/2017/03/16/Spark集群配置（2）：安装Hadoop" target="_blank" rel="external">Spark集群配置（2）：安装Hadoop</a><br>. <a href="http://mrliao.cn/2017/03/16/Spark集群配置（3）：安装Spark" target="_blank" rel="external">Spark集群配置（3）：安装Spark</a></p>
+<p>. <a href="http://mrliao.cn/2017/03/16/Spark集群配置（1）：基础配置">Spark集群配置（1）：基础配置</a><br>. <a href="http://mrliao.cn/2017/03/16/Spark集群配置（2）：安装Hadoop">Spark集群配置（2）：安装Hadoop</a><br>. <a href="http://mrliao.cn/2017/03/16/Spark集群配置（3）：安装Spark">Spark集群配置（3）：安装Spark</a></p>
 <h3 id="hadoop-native-lib-问题"><a href="#hadoop-native-lib-问题" class="headerlink" title="hadoop native lib 问题"></a>hadoop native lib 问题</h3><p>在使用Hadoop和Spark时，有时候会出现这样一条警告：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">WARN org.apache.hadoop.util.NativeCodeLoader: Unable to <span class="keyword">load</span> <span class="keyword">native</span>-hadoop <span class="keyword">library</span> <span class="keyword">for</span> your platform... <span class="keyword">using</span> builtin-<span class="keyword">Java</span> classes <span class="keyword">where</span> applicable.</div></pre></td></tr></table></figure></p>
 <p>原因是你安装的Hadoop编译位数和你的系统位数不一致（准确的说是和JDK位数不一致）。因为官方发布的Hadoop版本都是在<code>32位</code>的机器上编译的，因此如果你的机器是<code>64位</code>就会出现这个警告。但是如果你是<code>32位</code>的系统，则不会出现这个警告。<br>如果你使用Spark的功能很简单，又不在乎这个警告，可以不用管它。不会影响基础功能的使用。<br>如果想解决这个问题，就需要自己亲自编译响应版本的<code>Hadoop</code>源码。但是需要指出的是，Linux上编译软件很复杂，因此你很可能在编译时遇到各种各样奇怪的问题。因此希望你能够做足准备后才编译。即使一路顺畅一般编译也需要几个小时（视电脑配置而定）。</p>
-<p>我是在<code>64位</code>系统上安装的<code>hadoop-2.7.3.tar.gz</code>。因此自己将代码编译了一遍。自己编译的结果和官方发布的差别只在于<code>hadoop/lib/native</code>这个文件夹。因此如果你使用的是<code>hadoop-2.7.3.tar.gz</code>，则可以直接在这里下载<a href="http://mrliao.cn/data/native.zip" target="_blank" rel="external">native.zip</a>，然后在所有机器上按照下面的命令来将其替换到官方包中。</p>
+<p>我是在<code>64位</code>系统上安装的<code>hadoop-2.7.3.tar.gz</code>。因此自己将代码编译了一遍。自己编译的结果和官方发布的差别只在于<code>hadoop/lib/native</code>这个文件夹。因此如果你使用的是<code>hadoop-2.7.3.tar.gz</code>，则可以直接在这里下载<a href="http://mrliao.cn/data/native.zip">native.zip</a>，然后在所有机器上按照下面的命令来将其替换到官方包中。</p>
 <figure class="highlight crystal"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">$ unzip native.zip</div><div class="line"></div><div class="line"><span class="comment"># 删除自带的native文件夹</span></div><div class="line">$ rm -rf /usr/hadoop/<span class="class"><span class="keyword">lib</span>/<span class="title">native</span>/</span></div><div class="line"></div><div class="line"><span class="comment"># 并将我们的native文件夹复制替换到/usr/hadoop/lib/中</span></div><div class="line">$ mv native/ <span class="regexp">/usr/hadoop</span><span class="regexp">/lib/</span></div><div class="line"></div><div class="line"><span class="comment"># 为libhadoop.so.1.0.0文件创建一个软连接libhadoop.so</span></div><div class="line">$ ln -s /usr/hadoop/<span class="class"><span class="keyword">lib</span>/<span class="title">native</span>/<span class="title">libhadoop</span>.<span class="title">so</span>.1.0.0  /<span class="title">usr</span>/<span class="title">hadoop</span>/<span class="title">lib</span>/<span class="title">native</span>/<span class="title">libhadoop</span>.<span class="title">so</span></span></div><div class="line"></div><div class="line"><span class="comment"># 为libhdfs.so.0.0.0文件创建一个软连接libhdfs.so</span></div><div class="line">$ ln -s /usr/hadoop/<span class="class"><span class="keyword">lib</span>/<span class="title">native</span>/<span class="title">libhdfs</span>.<span class="title">so</span>.0.0.0  /<span class="title">usr</span>/<span class="title">hadoop</span>/<span class="title">lib</span>/<span class="title">native</span>/<span class="title">libhdfs</span>.<span class="title">so</span></span></div></pre></td></tr></table></figure>
 <p>然后在环境变量(<code>/etc/profile</code>)中添加:</p>
 <figure class="highlight routeros"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># 指明我们要使用的Native包的位置</span></div><div class="line"><span class="builtin-name">export</span> <span class="attribute">HADOOP_COMMON_LIB_NATIVE_DIR</span>=<span class="string">"<span class="variable">$HADOOP_HOME</span>/lib/native"</span></div><div class="line"></div><div class="line"><span class="builtin-name">export</span> <span class="attribute">JAVA_LIBRARY_PATH</span>=<span class="string">"<span class="variable">$HADOOP_HOME</span>/lib/native"</span></div></pre></td></tr></table></figure>

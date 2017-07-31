@@ -91,7 +91,7 @@
 <meta name="keywords" content="Spark,Hadoop">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Spark集群配置（2）：安装Hadoop">
-<meta property="og:url" content="http://127.0.0.1:4000/2017/03/16/Spark集群配置（2）：安装Hadoop/index.html">
+<meta property="og:url" content="http://mrliao.cn/2017/03/16/Spark集群配置（2）：安装Hadoop/index.html">
 <meta property="og:site_name" content="Mr. Liao">
 <meta property="og:description" content="前言本文是《Spark集群配置》的第二篇。主要讲解安装Spark前安装Hadoop的步骤。其他的几篇传送门： . Spark集群配置（1）：基础配置. Spark集群配置（3）：安装Spark. Spark集群配置（4）：其他填坑杂项 本文要求读者有一定的Linux命令基础，并且在多台机器上完成了第一篇中的基础配置。内容主要参考HDFS的官方文档。下面我们开始正文。 为什么要安装Hadoop首先需">
 <meta property="og:locale" content="zh-Hans">
@@ -126,7 +126,7 @@
 
 
 
-  <link rel="canonical" href="http://127.0.0.1:4000/2017/03/16/Spark集群配置（2）：安装Hadoop/"/>
+  <link rel="canonical" href="http://mrliao.cn/2017/03/16/Spark集群配置（2）：安装Hadoop/"/>
 
 
 
@@ -261,7 +261,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://127.0.0.1:4000/2017/03/16/Spark集群配置（2）：安装Hadoop/">
+    <link itemprop="mainEntityOfPage" href="http://mrliao.cn/2017/03/16/Spark集群配置（2）：安装Hadoop/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="LIAO">
@@ -334,7 +334,7 @@
 
       
         <h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>本文是《Spark集群配置》的第二篇。主要讲解安装<code>Spark</code>前安装<code>Hadoop</code>的步骤。其他的几篇传送门：</p>
-<p>. <a href="http://mrliao.cn/2017/03/16/Spark集群配置（1）：基础配置" target="_blank" rel="external">Spark集群配置（1）：基础配置</a><br>. <a href="http://mrliao.cn/2017/03/16/Spark集群配置（3）：安装Spark" target="_blank" rel="external">Spark集群配置（3）：安装Spark</a><br>. <a href="http://mrliao.cn/2017/03/16/Spark集群配置（4）：其他填坑杂项" target="_blank" rel="external">Spark集群配置（4）：其他填坑杂项</a></p>
+<p>. <a href="http://mrliao.cn/2017/03/16/Spark集群配置（1）：基础配置">Spark集群配置（1）：基础配置</a><br>. <a href="http://mrliao.cn/2017/03/16/Spark集群配置（3）：安装Spark">Spark集群配置（3）：安装Spark</a><br>. <a href="http://mrliao.cn/2017/03/16/Spark集群配置（4）：其他填坑杂项">Spark集群配置（4）：其他填坑杂项</a></p>
 <p>本文要求读者有一定的<code>Linux</code>命令基础，并且在多台机器上完成了第一篇中的基础配置。内容主要参考<code>HDFS</code>的<a href="http://hadoop.apache.org/docs/r2.7.3/hadoop-project-dist/hadoop-hdfs/HdfsUserGuide.html" target="_blank" rel="external">官方文档</a>。<br>下面我们开始正文。</p>
 <h3 id="为什么要安装Hadoop"><a href="#为什么要安装Hadoop" class="headerlink" title="为什么要安装Hadoop"></a>为什么要安装Hadoop</h3><p>首先需要搞清楚的一个问题是，我们为什么要安装<code>Hadoop</code>？<br>我的答案是，我们要使用<code>Hadoop</code>的<code>HDFS</code>分布式文件存储系统，我们要使用<code>Yarn</code>资源管理系统来为我们的分布式计算服务。<br>但不使用它的<code>MapReduce</code>计算框架，因为我们要使用<code>Spark</code>的计算框架。</p>
 <h3 id="下载Hadoop"><a href="#下载Hadoop" class="headerlink" title="下载Hadoop"></a>下载Hadoop</h3><p>到官网<a href="http://hadoop.apache.org/releases.html" target="_blank" rel="external">hadoop.apache.org</a>下载一个版本的<code>Hadoop</code>。在下载页面中每个版本都有<code>source</code>和<code>binary</code>两种版本，其中<code>source</code>是源代码，下载后需要自己编译，<code>binary</code>是编译好的版本，可以直接安装。</p>
@@ -376,7 +376,7 @@ $ hadoop fs -get /user/hadoop/file localfile
 <pre><code># 删除指定文件
 $ hadoop fs -rm /data/filename
 </code></pre><p>还有一些其他的文件操作命令请参考<a href="http://hadoop.apache.org/docs/r1.0.4/cn/hdfs_shell.html" target="_blank" rel="external">《Hadoop Shell命令》</a>。</p>
-<p>到此我们配置完了Hadoop的HDFS，如需继续进行，可以参见<a href="http://mrliao.cn/2017/03/16/Spark集群配置（3）：安装Spark" target="_blank" rel="external">Spark集群配置（3）：安装Spark</a></p>
+<p>到此我们配置完了Hadoop的HDFS，如需继续进行，可以参见<a href="http://mrliao.cn/2017/03/16/Spark集群配置（3）：安装Spark">Spark集群配置（3）：安装Spark</a></p>
 
       
     </div>

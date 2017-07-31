@@ -91,7 +91,7 @@
 <meta name="keywords" content="Spark">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Spark集群配置（3）：安装Spark">
-<meta property="og:url" content="http://127.0.0.1:4000/2017/03/16/Spark集群配置（3）：安装Spark/index.html">
+<meta property="og:url" content="http://mrliao.cn/2017/03/16/Spark集群配置（3）：安装Spark/index.html">
 <meta property="og:site_name" content="Mr. Liao">
 <meta property="og:description" content="前言本文是《Spark集群配置》的第三篇。主要讲解安装Spark的步骤。其他的几篇传送门： . Spark集群配置（1）：基础配置. Spark集群配置（2）：安装Hadoop. Spark集群配置（4）：其他填坑杂项 本文要求读者有一定的Linux命令基础，并且在多台机器上完成了前篇中的基础配置。下面我们开始正文。 下载Spark请到Spark官网下载。下载时唯一需要注意的是要选择与之前安装的H">
 <meta property="og:locale" content="zh-Hans">
@@ -126,7 +126,7 @@
 
 
 
-  <link rel="canonical" href="http://127.0.0.1:4000/2017/03/16/Spark集群配置（3）：安装Spark/"/>
+  <link rel="canonical" href="http://mrliao.cn/2017/03/16/Spark集群配置（3）：安装Spark/"/>
 
 
 
@@ -261,7 +261,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://127.0.0.1:4000/2017/03/16/Spark集群配置（3）：安装Spark/">
+    <link itemprop="mainEntityOfPage" href="http://mrliao.cn/2017/03/16/Spark集群配置（3）：安装Spark/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="LIAO">
@@ -334,7 +334,7 @@
 
       
         <h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>本文是《Spark集群配置》的第三篇。主要讲解安装<code>Spark</code>的步骤。其他的几篇传送门：</p>
-<p>. <a href="http://mrliao.cn/2017/03/16/Spark集群配置（1）：基础配置" target="_blank" rel="external">Spark集群配置（1）：基础配置</a><br>. <a href="http://mrliao.cn/2017/03/16/Spark集群配置（2）：安装Hadoop" target="_blank" rel="external">Spark集群配置（2）：安装Hadoop</a><br>. <a href="http://mrliao.cn/2017/03/16/Spark集群配置（4）：其他填坑杂项" target="_blank" rel="external">Spark集群配置（4）：其他填坑杂项</a></p>
+<p>. <a href="http://mrliao.cn/2017/03/16/Spark集群配置（1）：基础配置">Spark集群配置（1）：基础配置</a><br>. <a href="http://mrliao.cn/2017/03/16/Spark集群配置（2）：安装Hadoop">Spark集群配置（2）：安装Hadoop</a><br>. <a href="http://mrliao.cn/2017/03/16/Spark集群配置（4）：其他填坑杂项">Spark集群配置（4）：其他填坑杂项</a></p>
 <p>本文要求读者有一定的<code>Linux</code>命令基础，并且在多台机器上完成了前篇中的基础配置。下面我们开始正文。</p>
 <h3 id="下载Spark"><a href="#下载Spark" class="headerlink" title="下载Spark"></a>下载Spark</h3><p>请到<a href="http://spark.apache.org/" target="_blank" rel="external">Spark官网</a>下载。下载时唯一需要注意的是要选择与之前安装的Hadoop版本对应。<br>我安装的是<code>Hadoop 2.7.3</code>，因此我选择<code>Pre-bulit for Hadoop 2.7 and later</code>。建议选择最新版本的Spark，我这里使用的是<code>Spark 2.0.1</code>。<br>你也可以下载源码然后自己编译，但不推荐这么做。</p>
 <h3 id="安装Spark"><a href="#安装Spark" class="headerlink" title="安装Spark"></a>安装Spark</h3><p>在所有机器上执行以下命令安装：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="meta">$</span><span class="bash"> tar -xzvf spark-2.0.1-bin-hadoop2.7.tgz</span></div><div class="line"><span class="meta">$</span><span class="bash"> mv spark-2.0.1-bin-hadoop2.7 /usr/spark</span></div><div class="line"><span class="meta">$</span><span class="bash"> sudo chown spark:spark /usr/spark</span></div></pre></td></tr></table></figure></p>
@@ -352,7 +352,7 @@
 <p>此时集群即启动完成，正在待命。可以使用<code>spark-submit</code>命令提交程序在集群上运行：<br><figure class="highlight crmsh"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ spark-submit --<span class="keyword">master</span> <span class="title">spark</span>://<span class="literal">master</span>:<span class="number">7077</span> my_script.py</div></pre></td></tr></table></figure></p>
 <p>也可以在启动<code>spark shell</code>连接集群运行：<br><figure class="highlight crmsh"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># scala 版</span></div><div class="line">$ spark-shell <span class="keyword">master</span> <span class="title">spark</span>://<span class="literal">master</span>:<span class="number">7077</span></div><div class="line"></div><div class="line"><span class="comment"># python 版</span></div><div class="line">$ pyspark <span class="keyword">master</span> <span class="title">spark</span>://<span class="literal">master</span>:<span class="number">7077</span></div></pre></td></tr></table></figure></p>
 <p>如果要停止集群，可以执行命令来停止：<br><figure class="highlight vim"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">stop</span>-<span class="keyword">all</span>.<span class="keyword">sh</span></div></pre></td></tr></table></figure></p>
-<p>到此我们完成了<code>Spark</code>的基本配置。但是在使用过程中会遇到很多坑，因此在这里将我目前遇到的坑整理在一起：<a href="http://mrliao.cn/2017/03/16/Spark集群配置（4）：其他填坑杂项" target="_blank" rel="external">Spark集群配置（4）：其他填坑杂项</a></p>
+<p>到此我们完成了<code>Spark</code>的基本配置。但是在使用过程中会遇到很多坑，因此在这里将我目前遇到的坑整理在一起：<a href="http://mrliao.cn/2017/03/16/Spark集群配置（4）：其他填坑杂项">Spark集群配置（4）：其他填坑杂项</a></p>
 
       
     </div>
