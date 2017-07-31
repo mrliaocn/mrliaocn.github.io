@@ -1,0 +1,787 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Linux,SSH," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="0、SSH登录原理简介SSH是一种远程会话安全协议协议，英文全称是Secure Shell。为了免密登录远程服务器，我们需要预先创建好一个密钥对，分为公钥与私钥。并将公钥预先存放于服务器端。当有远程客户端发起SSH访问时，服务器会向客户端发送一段随机字符串，随后客户端用自己的私钥将其加密返回给服务器。如果服务器能用预先保存的公钥将其解密，即认可该客户端的身份，允许接入。 在Linux中SSH分为客">
+<meta name="keywords" content="Linux,SSH">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux下SSH免密登录设置">
+<meta property="og:url" content="http://127.0.0.1:4000/2017/02/23/Linux下SSH免密登录设置/index.html">
+<meta property="og:site_name" content="Mr. Liao">
+<meta property="og:description" content="0、SSH登录原理简介SSH是一种远程会话安全协议协议，英文全称是Secure Shell。为了免密登录远程服务器，我们需要预先创建好一个密钥对，分为公钥与私钥。并将公钥预先存放于服务器端。当有远程客户端发起SSH访问时，服务器会向客户端发送一段随机字符串，随后客户端用自己的私钥将其加密返回给服务器。如果服务器能用预先保存的公钥将其解密，即认可该客户端的身份，允许接入。 在Linux中SSH分为客">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://127.0.0.1:4000/images/20170223/1.PNG">
+<meta property="og:image" content="http://127.0.0.1:4000/images/20170223/2.PNG">
+<meta property="og:image" content="http://127.0.0.1:4000/images/20170223/3.PNG">
+<meta property="og:image" content="http://127.0.0.1:4000/images/20170223/4.PNG">
+<meta property="og:image" content="http://127.0.0.1:4000/images/20170223/5.PNG">
+<meta property="og:image" content="http://127.0.0.1:4000/images/20170223/6.PNG">
+<meta property="og:image" content="http://127.0.0.1:4000/images/20170223/7.PNG">
+<meta property="og:updated_time" content="2017-02-23T02:22:00.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Linux下SSH免密登录设置">
+<meta name="twitter:description" content="0、SSH登录原理简介SSH是一种远程会话安全协议协议，英文全称是Secure Shell。为了免密登录远程服务器，我们需要预先创建好一个密钥对，分为公钥与私钥。并将公钥预先存放于服务器端。当有远程客户端发起SSH访问时，服务器会向客户端发送一段随机字符串，随后客户端用自己的私钥将其加密返回给服务器。如果服务器能用预先保存的公钥将其解密，即认可该客户端的身份，允许接入。 在Linux中SSH分为客">
+<meta name="twitter:image" content="http://127.0.0.1:4000/images/20170223/1.PNG">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"right","display":"hide","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://127.0.0.1:4000/2017/02/23/Linux下SSH免密登录设置/"/>
+
+
+
+
+
+  <title> Linux下SSH免密登录设置 | Mr. Liao </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-right page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Mr. Liao</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://127.0.0.1:4000/2017/02/23/Linux下SSH免密登录设置/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LIAO">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/uploads/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Mr. Liao">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Linux下SSH免密登录设置
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-02-23T10:22:00+08:00">
+                2017-02-23
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="0、SSH登录原理简介"><a href="#0、SSH登录原理简介" class="headerlink" title="0、SSH登录原理简介"></a>0、SSH登录原理简介</h3><p><code>SSH</code>是一种远程会话安全协议协议，英文全称是Secure Shell。为了免密登录远程服务器，我们需要预先创建好一个密钥对，分为公钥与私钥。并将公钥预先存放于服务器端。当有远程客户端发起<code>SSH</code>访问时，服务器会向客户端发送一段随机字符串，随后客户端用自己的私钥将其加密返回给服务器。如果服务器能用预先保存的公钥将其解密，即认可该客户端的身份，允许接入。</p>
+<p>在Linux中<code>SSH</code>分为客户端<code>openssh-client</code>和服务端<code>openssh-server</code>，如果你需要使用本机SSH访问其他机器，需要安装客户端，如果本机需要被其他机器访问，则需要安装服务端。一般情况下，用<code>ssh</code>表示客户端，用<code>sshd</code>表示服务端。Ubuntu会预装客户端而没有服务端，Centos两者都会安装。以Ubuntu为例查看是否有安装的方法是：</p>
+<pre><code># 查看是否安装了openssh-client，有ssh_config即为已安装
+$ ls /etc/ssh* 
+
+# 查看是否安装了openssh-server，有sshd_config即为已安装
+$ ls /etc/ssh/sshd*
+</code></pre><p>下图显示的即为系统中未安装<code>openssh-server</code>。</p>
+<p><img src="/images/20170223/1.PNG" alt="查看SSH安装状态" title="查看SSH安装状态"></p>
+<h3 id="1、准备工作：sshd安装"><a href="#1、准备工作：sshd安装" class="headerlink" title="1、准备工作：sshd安装"></a>1、准备工作：sshd安装</h3><p>正常情况下，可以直接在线安装<code>openssh-server</code>：</p>
+<pre><code>$ sudo apt install openssh-server
+</code></pre><p>但有的时候会出错，说找不到安装包，或者网络连接失败等。在网络连通的情况下，一般都是因为在国内访问被墙了，因此我们需要修改下载源，即<code>/etc/apt/source.list</code>文件。</p>
+<pre><code># 不熟悉vim的同学，可以使用sudo gedit /etc/apt/source.list来编辑
+sudo vim /etc/apt/source.list
+</code></pre><p>删掉文件里的所有内容（放心删），填写以下内容并保存：</p>
+<pre><code>deb http://mirrors.163.com/ubuntu/ trusty main restricted universe multiverse
+deb http://mirrors.163.com/ubuntu/ trusty-security main restricted universe multiverse
+deb http://mirrors.163.com/ubuntu/ trusty-updates main restricted universe multiverse
+deb http://mirrors.163.com/ubuntu/ trusty-proposed main restricted universe multiverse
+deb http://mirrors.163.com/ubuntu/ trusty-backports main restricted universe multiverse
+deb-src http://mirrors.163.com/ubuntu/ trusty main restricted universe multiverse
+deb-src http://mirrors.163.com/ubuntu/ trusty-security main restricted universe multiverse
+deb-src http://mirrors.163.com/ubuntu/ trusty-updates main restricted universe multiverse
+deb-src http://mirrors.163.com/ubuntu/ trusty-proposed main restricted universe multiverse
+deb-src http://mirrors.163.com/ubuntu/ trusty-backports main restricted universe multiverse
+</code></pre><p>然后依次执行以下两个命令，中间会有部分更新失败，将下面的命令多执行几次确保数据全部更新：</p>
+<pre><code>sudo apt-get update
+sudo apt-get upgrade
+</code></pre><p>然后再回到上面安装<code>openssh-server</code>。安装完毕后执行<code>ps -e |grep sshd</code>命令查看<code>sshd</code>是否运行，如果发现有<code>sshd</code>即为已经运行。如果没有，则执行<code>sudo /etc/init.d/ssh start</code>来启动。</p>
+<h3 id="2、服务端配置"><a href="#2、服务端配置" class="headerlink" title="2、服务端配置"></a>2、服务端配置</h3><p>编辑<code>/etc/ssh/sshd_config</code>,确保下面的内容生效：</p>
+<pre><code>RSAAuthentication         yes
+PubkeyAuthentication     yes
+AuthorizedKeysFile        ~/.ssh/authorized_keys
+</code></pre><p>执行<code>sudo /etc/init.d/ssh restart</code>重启<code>sshd</code>服务。</p>
+<p>现在需要选择你要远程登录的身份。你可以选择使用<code>root</code>用户登录，也可以选择使用普通用户登录。一般来说<code>root</code>用户的权限太大，因此推荐使用普通用户。登录以后再使用<code>su -</code>来执行高权限操作。下面我们以一个普通用户<code>liao</code>为例（<code>root</code>用户操作同理）。</p>
+<p>选择你的身份<code>su liao</code>，进入用户的家目录<code>cd ~</code>，创建一个<code>.ssh</code>文件夹<code>mkdir .ssh</code>，修改文件夹权限<code>chmod 750 .ssh</code>，进入该文件夹<code>cd .ssh</code>，新建<code>authorized_keys</code>文件<code>touch authorized_keys</code>，修改文件权限<code>chmod 640 authorized_keys</code>。</p>
+<p><img src="/images/20170223/2.PNG" alt="创建.ssh文件" title="创建.ssh文件"></p>
+<p>然后关闭防火墙<code>sudo ufw disable</code>。</p>
+<p><img src="/images/20170223/3.PNG" alt="关闭防火墙" title="关闭防火墙"></p>
+<p>最后使用<code>ifconfig</code>命令查询服务器的IP地址备用。如图，我的Ubuntu的IP地址是<code>192.168.10.130</code>。</p>
+<p><img src="/images/20170223/4.PNG" alt="查看IP" title="查看IP"></p>
+<p>到此，服务端配置完毕。</p>
+<h3 id="3、客户端配置"><a href="#3、客户端配置" class="headerlink" title="3、客户端配置"></a>3、客户端配置</h3><p>对客户端系统没有要求，可以是Linux、Mac OS、Windows。如果你要配置Windows，需要先安装<code>Bash</code>，常用的Bash软件有很多。我使用的是<code>Git</code>。<code>Bsah</code>类似于Windows的命令行<code>cmd</code>，能够提供很多类似Unix系统的操作命令和功能。</p>
+<p>在Bash中，进入<code>~</code>目录（<code>C:\Users\LIAO</code>目录），查看有没有<code>.ssh</code>目录，以及<code>.ssh</code>目录下有没有<code>id_rsa</code>和<code>id_rsa.pub</code>这两个文件。如果都有跳过这一段。否则执行<code>ssh-keygen -t rsa</code>，然后一路回车到底。这样你就获得了一对秘钥。其中<code>id_rsa.pub</code>是公钥，可以公开，<code>id_rsa</code>是私钥不能公开。</p>
+<p>生成完密钥对后，执行以下命令：</p>
+<pre><code>scp .ssh/id_rsa.pub liao@192.168.10.130:~/.ssh/authorized_keys
+</code></pre><p>这条命令作用是，将客户端<code>id_rsa.pub</code>里面的内容，发送到服务端，并存储到<code>~/.ssh/authorized_keys</code>中。这里的<code>liao</code>要换成你登录服务器所要用的用户名，IP是服务器的IP。中途会问你服务器是否可信，输入<code>yes</code>，接着连接服务器，要求你输入<code>liao</code>用户的密码，输入。</p>
+<p>网上的大多数教程都推荐使用上面的命令，但是这条命令有时候会出现权限错误。因此可以使用下面的命令代替，功能是一样的：</p>
+<pre><code>cat .ssh/id_rsa.pub | ssh liao@192.168.10.130 &quot;cat - &gt;&gt;~/.ssh/authorized_keys&quot;
+</code></pre><p><img src="/images/20170223/5.PNG" alt="发送公钥到服务器" title="发送公钥到服务器"></p>
+<p>到这里，客户端也配置完毕。</p>
+<h3 id="4、测试"><a href="#4、测试" class="headerlink" title="4、测试"></a>4、测试</h3><p>在客户端Bash执行<code>ssh liao@192.168.10.130</code>，登录成功。</p>
+<p><img src="/images/20170223/6.PNG" alt="ssh登录" title="ssh登录"></p>
+<h3 id="5、高级用法"><a href="#5、高级用法" class="headerlink" title="5、高级用法"></a>5、高级用法</h3><p>有的时候，我们不想让远程登录到<code>bash</code>，因为Bash的操作权限还是太大了，比如我们只想用<code>liao</code>这个用户来操作<code>git</code>命令，来管理代码仓库，而禁止他登录远程服务器的<code>bash</code>。这就需要修改用户的登录配置了。</p>
+<p>下面以<code>liao</code>用户只能登录后执行<code>Python</code>为例（其他同理）：</p>
+<pre><code># 服务器上
+sudo vim /etc/passwd
+
+# 找到liao用户，类似于这样的：
+liao:x:1000:1000:liao,,,:/home/liao:/bin/bash
+</code></pre><p>这条数据被冒号分割为7个部分，各部分的详细介绍看<a href="http://luzl.iteye.com/blog/564404" target="_blank" rel="external">这里</a>，其中最后一部分即为用户登录后启动的程序。老版本的Linux系统一般为<code>/bin/sh</code>或者<code>/bin/shell</code>。新版本的一般都是<code>/bin/bash</code>，只是名字不同，但是一个东西。</p>
+<p>我们要把最后一部分修改为<code>/usr/bin/python3.5</code>，则用户登录后就直接进入了<code>Python shell</code>。或者修改为<code>/bin/false</code>则是禁止登入<code>bash</code>，但是可以执行其他的远程命令。下图为<code>Python</code>的示例，在登录后会直接进入<code>Python3.5</code>。当你在<code>Python Shell</code>中执行<code>exit()</code>时，会直接退出登录，而不是退出到<code>bash</code>，从而限制了用户的操作。</p>
+<p><img src="/images/20170223/7.PNG" alt="限制远程登录只能进入Python" title="限制远程登录只能进入Python"></p>
+<p>当然<code>Python</code>能做的事其实和<code>bash</code>差不多，所以没有人会这样来设置<code>Python</code>，这里只是用来演示。一般来说，都会设置为某些专用功能，比如<code>git</code>等，利用该程序内部的逻辑来限制用户的权限。这样可以大大提高服务器的安全性。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Linux/" rel="tag"># Linux</a>
+          
+            <a href="/tags/SSH/" rel="tag"># SSH</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/06/17/tornado的使用小技巧/" rel="next" title="tornado的使用小技巧">
+                <i class="fa fa-chevron-left"></i> tornado的使用小技巧
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/03/16/Spark集群配置（4）：其他填坑杂项/" rel="prev" title="Spark集群配置（4）：其他填坑杂项">
+                Spark集群配置（4）：其他填坑杂项 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+          
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/uploads/avatar.jpg"
+               alt="LIAO" />
+          <p class="site-author-name" itemprop="name">LIAO</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+        
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">10</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">10</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/mrliaocn" target="_blank" title="Github">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Github
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/u/3248752395" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  Weibo
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#0、SSH登录原理简介"><span class="nav-number">1.</span> <span class="nav-text">0、SSH登录原理简介</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1、准备工作：sshd安装"><span class="nav-number">2.</span> <span class="nav-text">1、准备工作：sshd安装</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2、服务端配置"><span class="nav-number">3.</span> <span class="nav-text">2、服务端配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3、客户端配置"><span class="nav-number">4.</span> <span class="nav-text">3、客户端配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4、测试"><span class="nav-number">5.</span> <span class="nav-text">4、测试</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5、高级用法"><span class="nav-number">6.</span> <span class="nav-text">5、高级用法</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LIAO</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+  
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="cdn.bootcss.com/mathjax/2.7.1/MathJax.js"></script>
+  
+
+
+  
+
+  
+
+  
+
+
+  
+
+</body>
+</html>

@@ -1,0 +1,747 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Linux,Spark," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="前言本文是《Spark集群配置》的第一篇。主要讲解安装Spark前系统的基础配置。其他的几篇传送门： . Spark集群配置（2）：安装Hadoop. Spark集群配置（3）：安装Spark. Spark集群配置（4）：其他填坑杂项 本文要求读者有一定的Linux命令基础，最好有一个或多个比较好的机器，可以跟着一步一步安装。下面我们开始正文。 安装Linux本文使用的Ubuntu-16.10-x">
+<meta name="keywords" content="Linux,Spark">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Spark集群配置（1）：基础配置">
+<meta property="og:url" content="http://127.0.0.1:4000/2017/03/16/Spark集群配置（1）：基础配置/index.html">
+<meta property="og:site_name" content="Mr. Liao">
+<meta property="og:description" content="前言本文是《Spark集群配置》的第一篇。主要讲解安装Spark前系统的基础配置。其他的几篇传送门： . Spark集群配置（2）：安装Hadoop. Spark集群配置（3）：安装Spark. Spark集群配置（4）：其他填坑杂项 本文要求读者有一定的Linux命令基础，最好有一个或多个比较好的机器，可以跟着一步一步安装。下面我们开始正文。 安装Linux本文使用的Ubuntu-16.10-x">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2017-03-16T08:44:00.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Spark集群配置（1）：基础配置">
+<meta name="twitter:description" content="前言本文是《Spark集群配置》的第一篇。主要讲解安装Spark前系统的基础配置。其他的几篇传送门： . Spark集群配置（2）：安装Hadoop. Spark集群配置（3）：安装Spark. Spark集群配置（4）：其他填坑杂项 本文要求读者有一定的Linux命令基础，最好有一个或多个比较好的机器，可以跟着一步一步安装。下面我们开始正文。 安装Linux本文使用的Ubuntu-16.10-x">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"right","display":"hide","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://127.0.0.1:4000/2017/03/16/Spark集群配置（1）：基础配置/"/>
+
+
+
+
+
+  <title> Spark集群配置（1）：基础配置 | Mr. Liao </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-right page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Mr. Liao</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://127.0.0.1:4000/2017/03/16/Spark集群配置（1）：基础配置/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LIAO">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/uploads/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Mr. Liao">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Spark集群配置（1）：基础配置
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-03-16T16:44:00+08:00">
+                2017-03-16
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>本文是《Spark集群配置》的第一篇。主要讲解安装<code>Spark</code>前系统的基础配置。其他的几篇传送门：</p>
+<p>. <a href="http://mrliao.cn/2017/03/16/Spark集群配置（2）：安装Hadoop" target="_blank" rel="external">Spark集群配置（2）：安装Hadoop</a><br>. <a href="http://mrliao.cn/2017/03/16/Spark集群配置（3）：安装Spark" target="_blank" rel="external">Spark集群配置（3）：安装Spark</a><br>. <a href="http://mrliao.cn/2017/03/16/Spark集群配置（4）：其他填坑杂项" target="_blank" rel="external">Spark集群配置（4）：其他填坑杂项</a></p>
+<p>本文要求读者有一定的<code>Linux</code>命令基础，最好有一个或多个比较好的机器，可以跟着一步一步安装。下面我们开始正文。</p>
+<h3 id="安装Linux"><a href="#安装Linux" class="headerlink" title="安装Linux"></a>安装Linux</h3><p>本文使用的<code>Ubuntu-16.10-x64</code>版本的Linux。<br>这里需要说一下版本的选择，我个人的感觉是，最好选择老一点稳定一点的版本。我之前使用过<code>Ubuntu-16.04</code>版本的，结果蓝屏了好几次，感觉是很不稳定。之所以选择<code>16.10</code>，主要是想体验下新版本，不过还好，目前还没啥问题。</p>
+<p>需要提醒的是，安装时要选择安装英文版，主要原因是英文版的文件目录中不会出现汉字，可以为后续操作省去很多麻烦。如果英文实在不好，也要先安装为英文版，安装完成后再选择系统语言为中文版。此外在安装过程中，会要求你设置机器的名称和创建新用户。我的建议是，选定一台机器为主节点，命名为<code>master</code>，其他为从节点，依次命名为<code>slave1</code>、<code>slave2</code>、<code>slave3</code>等。然后所有机器创建的用户名一定要相同，比如都为spark，密码为了方便记住，也尽量设为一致的。</p>
+<h3 id="配置root用户密码"><a href="#配置root用户密码" class="headerlink" title="配置root用户密码"></a>配置root用户密码</h3><p>安装完毕后，打开终端，执行命令<code>sudo passwd</code>，会要求你先输入当前用户的密码，然后输入<code>root</code>用户的密码并重复即可。</p>
+<h3 id="安装Vim"><a href="#安装Vim" class="headerlink" title="安装Vim"></a>安装Vim</h3><p><code>Vim</code>是Linux上使用终端修改文件的工具。一般情况下，我们对于有界面的机器可以使用记事本之内的编辑器直接编辑，但对于部分权限限制文件、系统隐藏文件和远程文件，编辑器则无能为力，一般是因为权限不够或者无法显示界面。因此需要使用Vim。想使用Linux，则最好熟练使用Vim，其道理类似于想使用互联网，则最好有个浏览器一样。<br>保持机器联网，在所有机器上执行执行：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#</span><span class="bash"> Ubuntu用户</span></div><div class="line"><span class="meta">$</span><span class="bash"> sudo apt-get install vim</span></div><div class="line"></div><div class="line"><span class="meta">#</span><span class="bash"> Centos用户</span></div><div class="line">sudo yum install vim</div></pre></td></tr></table></figure></p>
+<p>安装完成后可以通过这里学习Vim的命令<a href="http://blog.csdn.net/namecyf/article/details/7787479" target="_blank" rel="external">《Vim配置及插件安装管理》</a></p>
+<h3 id="配置hosts"><a href="#配置hosts" class="headerlink" title="配置hosts"></a>配置hosts</h3><p>首先确保所有机器在同一局域网络中，并且能ping通。在每台机器上执行ifconfig命令，获取每台机器的IP地址。<br>使用终端命令<code>sudo vim /etc/hosts</code>打开<code>hosts</code>文件。<code>hosts</code>件是本地的DNS路由表，使用<code>vim</code>命令来修改。<br>假设各个机器的IP分别为<br><figure class="highlight css"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">192<span class="selector-class">.168</span><span class="selector-class">.1</span><span class="selector-class">.10</span> 	<span class="selector-tag">master</span></div><div class="line">192<span class="selector-class">.168</span><span class="selector-class">.1</span><span class="selector-class">.11</span> 	<span class="selector-tag">slave1</span></div><div class="line">192<span class="selector-class">.168</span><span class="selector-class">.1</span><span class="selector-class">.12</span> 	<span class="selector-tag">slave2</span></div></pre></td></tr></table></figure></p>
+<p>以修改master机器为例：保留<code>127.0.0.1     localhost</code>，并将hosts文件中<code>127.0.0.1     master</code> 修改为 <code>192.168.1.10     master</code>，并在文件尾添加所有剩下机器的信息比如我这里的内容如下：</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">127<span class="selector-class">.0</span><span class="selector-class">.0</span><span class="selector-class">.1</span>       <span class="selector-tag">localhost</span></div><div class="line">192<span class="selector-class">.168</span><span class="selector-class">.1</span><span class="selector-class">.10</span>   	<span class="selector-tag">master</span></div><div class="line"></div><div class="line"># <span class="selector-tag">The</span> <span class="selector-tag">following</span> <span class="selector-tag">lines</span> <span class="selector-tag">are</span> <span class="selector-tag">desirable</span> <span class="selector-tag">for</span> <span class="selector-tag">IPv6</span> <span class="selector-tag">capable</span> <span class="selector-tag">hosts</span></div><div class="line"><span class="selector-pseudo">::1</span>     <span class="selector-tag">ip6-localhost</span> <span class="selector-tag">ip6-loopback</span></div><div class="line"><span class="selector-tag">fe00</span><span class="selector-pseudo">::0</span> <span class="selector-tag">ip6-localnet</span></div><div class="line"><span class="selector-tag">ff00</span><span class="selector-pseudo">::0</span> <span class="selector-tag">ip6-mcastprefix</span></div><div class="line"><span class="selector-tag">ff02</span><span class="selector-pseudo">::1</span> <span class="selector-tag">ip6-allnodes</span></div><div class="line"><span class="selector-tag">ff02</span><span class="selector-pseudo">::2</span> <span class="selector-tag">ip6-allrouters</span></div><div class="line"></div><div class="line">192<span class="selector-class">.168</span><span class="selector-class">.1</span><span class="selector-class">.11</span>    <span class="selector-tag">slave1</span></div><div class="line">192<span class="selector-class">.168</span><span class="selector-class">.1</span><span class="selector-class">.12</span>    <span class="selector-tag">slave2</span></div></pre></td></tr></table></figure>
+<p>其他机器也同理修改。</p>
+<h3 id="配置ssh无密码登录"><a href="#配置ssh无密码登录" class="headerlink" title="配置ssh无密码登录"></a>配置ssh无密码登录</h3><p>本部分请参考<a href="http://mrliao.cn/2017/02/23/Linux下SSH免密登录设置/" target="_blank" rel="external">《Linux下SSH免密登录设置》</a><br>配置ssh的要求是，主节点(<code>master</code>)可以免密登录所有从节点(<code>slave</code>)即可。从节点无需访问主节点和其他从节点。</p>
+<h3 id="安装JDK"><a href="#安装JDK" class="headerlink" title="安装JDK"></a>安装JDK</h3><p>JDK所有机器都安装。在下载<code>JDK</code>时，要看清楚自己系统的位数，下载对应的版本。可以去<a href="https://www.java.com/zh_CN/" target="_blank" rel="external">JAVA官网</a>下载，要求是1.7及更新版本。完成后依次执行以下命令：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#</span><span class="bash"> 执行解压命令</span></div><div class="line"><span class="meta">$</span><span class="bash"> tar -xzvf jdk-8u111-linux-x64.tar.gz </span></div><div class="line"></div><div class="line"><span class="meta">#</span><span class="bash"> 移动解压目录到/usr目录，并重命名为jdk</span></div><div class="line"><span class="meta">$</span><span class="bash"> mv jdk1.8.0_111  /usr/jdk</span></div><div class="line"></div><div class="line"><span class="meta">#</span><span class="bash"> 修改文件夹及内部文件的所属用户和所属组均为 spark</span></div><div class="line"><span class="meta">$</span><span class="bash"> sudo chown -R spark:spark /usr/jdk</span></div></pre></td></tr></table></figure></p>
+<p>然后修改环境变量。环境变量的修改方法有很多种，最推荐的是修改系统环境变量<code>/etc/profile</code>，这样在使用各种用户身份时可以免去很多麻烦。执行命令<code>sudo vim /etc/profile</code>，将以下内容添加到文件结尾处并保存：<br><figure class="highlight routeros"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="builtin-name">export</span> <span class="attribute">JAVA_HOME</span>=<span class="string">"/usr/jdk"</span></div><div class="line"><span class="builtin-name">export</span> <span class="attribute">JRE_HOME</span>=<span class="string">"<span class="variable">$JAVA_HOME</span>/jre"</span></div><div class="line"><span class="builtin-name">export</span> <span class="attribute">CLASSPATH</span>=<span class="string">".:<span class="variable">$JAVA_HOME</span>/lib"</span></div><div class="line"><span class="builtin-name">export</span> <span class="attribute">PATH</span>=<span class="string">"<span class="variable">$JAVA_HOME</span>/bin:<span class="variable">$PATH</span>"</span></div></pre></td></tr></table></figure></p>
+<p>执行<code>source /etc/profile</code>重新加载环境变量，并执行<code>java -version</code>即可查看JDK是否安装好。</p>
+<h3 id="安装Scala"><a href="#安装Scala" class="headerlink" title="安装Scala"></a>安装Scala</h3><p>同安装<code>JDK</code>的方法相同，去<code>Scala</code>官网下载合适版本，执行：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="meta">$</span><span class="bash"> tar -xzvf scala-2.12.1.tgz</span></div><div class="line"><span class="meta">$</span><span class="bash"> mv scala-2.12.1 /usr/scala</span></div><div class="line"><span class="meta">$</span><span class="bash"> sudo chown -R spark:spark /usr/scala</span></div></pre></td></tr></table></figure></p>
+<p>然后添加以下内容到<code>/etc/profile</code>：<br><figure class="highlight routeros"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="builtin-name">export</span> <span class="attribute">SCALA_HOME</span>=<span class="string">"/usr/scala"</span></div><div class="line"><span class="builtin-name">export</span> <span class="attribute">PATH</span>=<span class="string">"<span class="variable">$SCALA_HOME</span>/bin:<span class="variable">$PATH</span>"</span></div></pre></td></tr></table></figure></p>
+<p>执行<code>source /etc/profile</code>重新加载环境变量，并执行<code>scala -version</code>即可查看scala是否安装好。</p>
+<h3 id="安装Anaconda"><a href="#安装Anaconda" class="headerlink" title="安装Anaconda"></a>安装Anaconda</h3><p><code>Anaconda</code>是一个集成的<code>Python</code>安装环境，是专门为科学计算和数据分析制作的。安装它的原因是，许多需要用到的科学计算库之间有着复杂的依赖关系，而且很多是不同版本的依赖，如果单纯需要使用时才安装的话，各种安装错误绝对会把人逼疯。因此强烈推荐安装。</p>
+<p>需要注意的是，不同版本的<code>Anaconda</code>包含了不同版本的<code>Python</code>，最新版的<code>Anaconda3-4.3.1-Linux-x86.sh</code>对应的是最新版的<code>Python3.6</code>，然而最新版本的<code>Spark</code>尚不支持<code>Python3.6</code>，会导致运行错误。<br>因此我在这里强烈推荐使用<code>Anaconda3-4.2.0-Linux.sh</code>，由于安装包较大，推荐去<a href="https://mirrors.tuna.tsinghua.edu.cn/anaconda/archive/" target="_blank" rel="external">清华大学镜像站</a>下载。下载时要选择正确的位数（32位或者64位）。</p>
+<p>下载完成后，执行命令开始安装程序。<br><figure class="highlight lsl"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">bash ./Anaconda3<span class="number">-4.2</span><span class="number">.0</span>-Linux-x86_64.sh</div></pre></td></tr></table></figure></p>
+<p>安装时会询问你安装在什么位置。为了方便后面的配置，请选择与之前一致的目录，即要输入安装路径为 <code>/usr/anaconda3</code>，然后一路回车。其中有一项是问你是否添加到环境变量，选择不添加（稍后我们手动添加）。</p>
+<p>安装完毕后，将以下内容添加到环境变量:<br><figure class="highlight routeros"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="builtin-name">export</span> <span class="attribute">PATH</span>=<span class="string">"/usr/anaconda3/bin:<span class="variable">$PATH</span>"</span></div></pre></td></tr></table></figure></p>
+<p>执行<code>source /etc/profile</code>重新加载环境变量，并执行<code>python -V</code>，如果提示类似为<code>Python 3.5.2 :: Anaconda 4.2.0 (64-bit)</code>即为安装成功。</p>
+<p>如果显示的是系统自带的Python版本，可以按照这篇文章<a href="http://blog.csdn.net/u011534057/article/details/51615193" target="_blank" rel="external">《Ubuntu更改默认python版本的两种方法》</a>修改系统默认的<code>Python</code>版本。需要注意的是，千万不要卸载系统自带的<code>Python</code>，因为很多系统工具都是依赖于系统自带的<code>Python</code>，一旦卸载，很可能会导致系统崩溃。</p>
+<h3 id="配置Jupyter-Notebook远程访问"><a href="#配置Jupyter-Notebook远程访问" class="headerlink" title="配置Jupyter Notebook远程访问"></a>配置Jupyter Notebook远程访问</h3><p><code>Jupyter Notebook</code>的前身是<code>IPython Notebook</code>，是一个将命令行搬到浏览器中的工具。在浏览器中执行命令行的好处是可以方便复制，可以查看历史，可以保存命令记录等等，反正是好处多多。而且在配置完集群之后，如果每次要执行程序都要到集群中写代码无疑是很不方便的，而使用<code>Jupyter</code>可以很方便的远程上传、修改、执行文件。<br><code>Jupyter</code>在上一步安装<code>Anaconda</code>时会自动被安装了。这里我们只需要配置一下<code>Jupyter</code>就可以了。需要注意的是，这里只用配置<code>master</code>机器的，从节点不需要配置。<br>首先进入<code>Python</code>命令行，执行：<br><figure class="highlight haml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">from notebook.auth import passwd</div><div class="line">passwd() </div><div class="line">-<span class="ruby"> Enter <span class="symbol">password:</span> </span></div><div class="line"><span class="ruby">- Verify <span class="symbol">password:</span> </span></div><div class="line"><span class="ruby">- <span class="string">'sha1:ce23d945972f:34769685a7ccd3d08c84a18c63968a41f1140274'</span></span></div></pre></td></tr></table></figure></p>
+<p>上面的执行中会要求你输入一个密码，这是你之后远程访问Jupyter时的密码，以防止别人访问你的机器。输入密码后你会获得一个很长的字符串，这是一个加盐的 <code>sha1加密</code> 字符串，记录下这个字符串（单引号内部的全部内容）。然后退出Python。</p>
+<p>在spark用户下执行<code>jupyter notebook --generate-config</code>，该命令是用来生成Jupyter的配置文件。<br>打开该文件<code>vim /home/spark/.jupyter/jupyter_notebook_config.py</code>，修改为以下内容:<br><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># 允许远程访问的IP，*代表所有</span></div><div class="line">c.NotebookApp.ip=<span class="string">'*'</span></div><div class="line"></div><div class="line"><span class="comment"># 设置访问密码，即之前生成的字符串</span></div><div class="line">c.NotebookApp.password = <span class="string">'sha1:ce23d945972f:34769685a7ccd3d08c84a18c63968a41f1140274'</span></div><div class="line"></div><div class="line"><span class="comment"># 启动Jupyter时是否立即启动浏览器，因为我们要远程访问，因此不需要启动浏览器</span></div><div class="line">c.NotebookApp.open_browser = <span class="keyword">False</span></div></pre></td></tr></table></figure></p>
+<p>修改后保存，此时终端中执行Shell命令<code>jupyter notebook</code>，就可以发现启动了Jupyter，其中有条提示为：<br><figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">The Jupyter Notebook is running at <span class="link">http://</span>[<span class="string">all ip address on your system</span>]:8888/</div></pre></td></tr></table></figure></p>
+<p>换一台同局域网内的电脑打开浏览器，访问<code>http://master:8888</code>就可进入<code>Jupyter</code>登录页面了，输入你自己设置的密码即可进入。<br>关于如何使用<code>Jupyter</code>，可以参见<a href="http://blog.csdn.net/tina_ttl/article/details/51031113" target="_blank" rel="external">《Jupyter Notebook各种使用方法记录》</a>，这里不再啰嗦。</p>
+<p>到此基础配置部分就结束了，如需继续进行，可以参见<a href="http://mrliao.cn/2017/03/16/Spark集群配置（2）：安装Hadoop" target="_blank" rel="external">Spark集群配置（2）：安装Hadoop</a></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Linux/" rel="tag"># Linux</a>
+          
+            <a href="/tags/Spark/" rel="tag"># Spark</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/03/16/Spark集群配置（2）：安装Hadoop/" rel="next" title="Spark集群配置（2）：安装Hadoop">
+                <i class="fa fa-chevron-left"></i> Spark集群配置（2）：安装Hadoop
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/07/31/【翻译】反向传播算法：使用图计算求微分/" rel="prev" title="【翻译】反向传播算法：使用图计算求微分">
+                【翻译】反向传播算法：使用图计算求微分 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+          
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/uploads/avatar.jpg"
+               alt="LIAO" />
+          <p class="site-author-name" itemprop="name">LIAO</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+        
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">10</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">10</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/mrliaocn" target="_blank" title="Github">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Github
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/u/3248752395" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  Weibo
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装Linux"><span class="nav-number">2.</span> <span class="nav-text">安装Linux</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置root用户密码"><span class="nav-number">3.</span> <span class="nav-text">配置root用户密码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装Vim"><span class="nav-number">4.</span> <span class="nav-text">安装Vim</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置hosts"><span class="nav-number">5.</span> <span class="nav-text">配置hosts</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置ssh无密码登录"><span class="nav-number">6.</span> <span class="nav-text">配置ssh无密码登录</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装JDK"><span class="nav-number">7.</span> <span class="nav-text">安装JDK</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装Scala"><span class="nav-number">8.</span> <span class="nav-text">安装Scala</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装Anaconda"><span class="nav-number">9.</span> <span class="nav-text">安装Anaconda</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置Jupyter-Notebook远程访问"><span class="nav-number">10.</span> <span class="nav-text">配置Jupyter Notebook远程访问</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LIAO</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+  
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="cdn.bootcss.com/mathjax/2.7.1/MathJax.js"></script>
+  
+
+
+  
+
+  
+
+  
+
+
+  
+
+</body>
+</html>

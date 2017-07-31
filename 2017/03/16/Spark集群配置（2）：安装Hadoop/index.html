@@ -1,0 +1,759 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Spark,Hadoop," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="前言本文是《Spark集群配置》的第二篇。主要讲解安装Spark前安装Hadoop的步骤。其他的几篇传送门： . Spark集群配置（1）：基础配置. Spark集群配置（3）：安装Spark. Spark集群配置（4）：其他填坑杂项 本文要求读者有一定的Linux命令基础，并且在多台机器上完成了第一篇中的基础配置。内容主要参考HDFS的官方文档。下面我们开始正文。 为什么要安装Hadoop首先需">
+<meta name="keywords" content="Spark,Hadoop">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Spark集群配置（2）：安装Hadoop">
+<meta property="og:url" content="http://127.0.0.1:4000/2017/03/16/Spark集群配置（2）：安装Hadoop/index.html">
+<meta property="og:site_name" content="Mr. Liao">
+<meta property="og:description" content="前言本文是《Spark集群配置》的第二篇。主要讲解安装Spark前安装Hadoop的步骤。其他的几篇传送门： . Spark集群配置（1）：基础配置. Spark集群配置（3）：安装Spark. Spark集群配置（4）：其他填坑杂项 本文要求读者有一定的Linux命令基础，并且在多台机器上完成了第一篇中的基础配置。内容主要参考HDFS的官方文档。下面我们开始正文。 为什么要安装Hadoop首先需">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2017-03-16T08:44:00.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Spark集群配置（2）：安装Hadoop">
+<meta name="twitter:description" content="前言本文是《Spark集群配置》的第二篇。主要讲解安装Spark前安装Hadoop的步骤。其他的几篇传送门： . Spark集群配置（1）：基础配置. Spark集群配置（3）：安装Spark. Spark集群配置（4）：其他填坑杂项 本文要求读者有一定的Linux命令基础，并且在多台机器上完成了第一篇中的基础配置。内容主要参考HDFS的官方文档。下面我们开始正文。 为什么要安装Hadoop首先需">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"right","display":"hide","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://127.0.0.1:4000/2017/03/16/Spark集群配置（2）：安装Hadoop/"/>
+
+
+
+
+
+  <title> Spark集群配置（2）：安装Hadoop | Mr. Liao </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-right page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Mr. Liao</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://127.0.0.1:4000/2017/03/16/Spark集群配置（2）：安装Hadoop/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LIAO">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/uploads/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Mr. Liao">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Spark集群配置（2）：安装Hadoop
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-03-16T16:44:00+08:00">
+                2017-03-16
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>本文是《Spark集群配置》的第二篇。主要讲解安装<code>Spark</code>前安装<code>Hadoop</code>的步骤。其他的几篇传送门：</p>
+<p>. <a href="http://mrliao.cn/2017/03/16/Spark集群配置（1）：基础配置" target="_blank" rel="external">Spark集群配置（1）：基础配置</a><br>. <a href="http://mrliao.cn/2017/03/16/Spark集群配置（3）：安装Spark" target="_blank" rel="external">Spark集群配置（3）：安装Spark</a><br>. <a href="http://mrliao.cn/2017/03/16/Spark集群配置（4）：其他填坑杂项" target="_blank" rel="external">Spark集群配置（4）：其他填坑杂项</a></p>
+<p>本文要求读者有一定的<code>Linux</code>命令基础，并且在多台机器上完成了第一篇中的基础配置。内容主要参考<code>HDFS</code>的<a href="http://hadoop.apache.org/docs/r2.7.3/hadoop-project-dist/hadoop-hdfs/HdfsUserGuide.html" target="_blank" rel="external">官方文档</a>。<br>下面我们开始正文。</p>
+<h3 id="为什么要安装Hadoop"><a href="#为什么要安装Hadoop" class="headerlink" title="为什么要安装Hadoop"></a>为什么要安装Hadoop</h3><p>首先需要搞清楚的一个问题是，我们为什么要安装<code>Hadoop</code>？<br>我的答案是，我们要使用<code>Hadoop</code>的<code>HDFS</code>分布式文件存储系统，我们要使用<code>Yarn</code>资源管理系统来为我们的分布式计算服务。<br>但不使用它的<code>MapReduce</code>计算框架，因为我们要使用<code>Spark</code>的计算框架。</p>
+<h3 id="下载Hadoop"><a href="#下载Hadoop" class="headerlink" title="下载Hadoop"></a>下载Hadoop</h3><p>到官网<a href="http://hadoop.apache.org/releases.html" target="_blank" rel="external">hadoop.apache.org</a>下载一个版本的<code>Hadoop</code>。在下载页面中每个版本都有<code>source</code>和<code>binary</code>两种版本，其中<code>source</code>是源代码，下载后需要自己编译，<code>binary</code>是编译好的版本，可以直接安装。</p>
+<p>但是这里有一个坑：官网编译好的版本，大多都是基于32位系统编译的。虽然大多数功能都可以64位上运行，但有一些功能不能使用，会报错，而且每次运行的时候会有个讨厌的Warn。因此推荐自己下载源码编译。在<code>Linux</code>上编译一般都很费事。如果读者想使用64位版本但又不想自己编译，则可以选择下载<code>hadoop 2.7.3</code>版本安装。在本系列的<a href="">《Spark集群配置（四）：其他填坑杂项》</a>中，我给出了该版本的编译结果。你可以直接下载，按照文中的方法替换相应文件即可。</p>
+<h3 id="安装Hadoop"><a href="#安装Hadoop" class="headerlink" title="安装Hadoop"></a>安装Hadoop</h3><p>假设你下载好了Hadoop编译版本<code>hadoop-2.7.3.tar.gz</code>，在所有机器上执行以下命令：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="meta">$</span><span class="bash"> tar -xzvf hadoop-2.7.3.tar.gz</span></div><div class="line"><span class="meta">$</span><span class="bash"> mv hadoop-2.7.3  /usr/hadoop</span></div><div class="line"><span class="meta">$</span><span class="bash"> sudo chown -R spark:spark /usr/hadoop</span></div></pre></td></tr></table></figure></p>
+<h3 id="配置环境变量"><a href="#配置环境变量" class="headerlink" title="配置环境变量"></a>配置环境变量</h3><p>将以下内容添加到<code>etc/profile</code>中：<br><figure class="highlight routeros"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="builtin-name">export</span> <span class="attribute">HADOOP_HOME</span>=<span class="string">"/usr/hadoop"</span></div><div class="line"><span class="builtin-name">export</span> <span class="attribute">PATH</span>=<span class="string">"<span class="variable">$HADOOP_HOME</span>/sbin:<span class="variable">$HADOOP_HOME</span>/bin:<span class="variable">$PATH</span>"</span></div></pre></td></tr></table></figure></p>
+<p>保存修改后应使用<code>source /etc/profile</code>刷新一下使其立即生效。</p>
+<h3 id="配置Hadoop"><a href="#配置Hadoop" class="headerlink" title="配置Hadoop"></a>配置Hadoop</h3><p>Hadoop的配置为文件位置在<code>hadoop/ect/hadoop/</code>中。由于我们只是用分布式文件存储功能，所以这里我们需要配置以下几个文件。<br>如果在<code>hadoop/ect/hadoop/</code>中没有找到相应的文件，请使用命令自己创建：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="meta">$</span><span class="bash"> touch new_file</span></div></pre></td></tr></table></figure></p>
+<h4 id="hadoop-env-sh"><a href="#hadoop-env-sh" class="headerlink" title="hadoop-env.sh"></a>hadoop-env.sh</h4><p>修改文件里的配置项目为以下内容，其他的内容不变：<br><figure class="highlight routeros"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># 默认值是export JAVA_HOME=$&#123;JAVA_HOME&#125;，但是会报错找不到，所以建议直接指明绝对路径</span></div><div class="line"><span class="builtin-name">export</span> <span class="attribute">JAVA_HOME</span>=/usr/jdk</div></pre></td></tr></table></figure></p>
+<h4 id="core-site-xml"><a href="#core-site-xml" class="headerlink" title="core-site.xml"></a>core-site.xml</h4><p>由于我们已经配置过hosts文件了，可以直接使用各个机器的别名。如果你没有配置过hosts，应该将下面的master替换成对应的IP。<br>将文件内替换为以下内容<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">configuration</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">property</span>&gt;</span></div><div class="line">                <span class="tag">&lt;<span class="name">name</span>&gt;</span>fs.defaultFS<span class="tag">&lt;/<span class="name">name</span>&gt;</span></div><div class="line">                <span class="comment">&lt;!-- 程序中访问hdfs时的根目录地址，修改时删除本条注释内容 --&gt;</span></div><div class="line">                <span class="tag">&lt;<span class="name">value</span>&gt;</span>hdfs://master:9000<span class="tag">&lt;/<span class="name">value</span>&gt;</span></div><div class="line">        <span class="tag">&lt;/<span class="name">property</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">property</span>&gt;</span></div><div class="line">                <span class="tag">&lt;<span class="name">name</span>&gt;</span>hadoop.tmp.dir<span class="tag">&lt;/<span class="name">name</span>&gt;</span></div><div class="line">                <span class="tag">&lt;<span class="name">value</span>&gt;</span>file:/usr/hadoop/tmp<span class="tag">&lt;/<span class="name">value</span>&gt;</span></div><div class="line">                <span class="tag">&lt;<span class="name">description</span>&gt;</span>Abase for other temporary directories.<span class="tag">&lt;/<span class="name">description</span>&gt;</span></div><div class="line">        <span class="tag">&lt;/<span class="name">property</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">configuration</span>&gt;</span></div></pre></td></tr></table></figure></p>
+<h4 id="yarn-site-xml"><a href="#yarn-site-xml" class="headerlink" title="yarn-site.xml"></a>yarn-site.xml</h4><p>由于我们已经配置过hosts文件了，可以直接使用各个机器的别名。如果你没有配置过hosts，应该将下面的master替换成对应的IP。<br>将文件内替换为以下内容：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">configuration</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">property</span>&gt;</span></div><div class="line">                <span class="tag">&lt;<span class="name">name</span>&gt;</span>yarn.resourcemanager.hostname<span class="tag">&lt;/<span class="name">name</span>&gt;</span></div><div class="line">                <span class="tag">&lt;<span class="name">value</span>&gt;</span>master<span class="tag">&lt;/<span class="name">value</span>&gt;</span></div><div class="line">        <span class="tag">&lt;/<span class="name">property</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">property</span>&gt;</span></div><div class="line">                <span class="tag">&lt;<span class="name">name</span>&gt;</span>yarn.nodemanager.aux-services<span class="tag">&lt;/<span class="name">name</span>&gt;</span></div><div class="line">                <span class="tag">&lt;<span class="name">value</span>&gt;</span>mapreduce_shuffle<span class="tag">&lt;/<span class="name">value</span>&gt;</span></div><div class="line">        <span class="tag">&lt;/<span class="name">property</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">configuration</span>&gt;</span>s</div></pre></td></tr></table></figure></p>
+<h4 id="hdfs-site-xml"><a href="#hdfs-site-xml" class="headerlink" title="hdfs-site.xml"></a>hdfs-site.xml</h4><p>由于我们已经配置过hosts文件了，可以直接使用各个机器的别名。如果你没有配置过hosts，应该将下面的master替换成对应的IP。<br>将文件内替换为以下内容：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">configuration</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">property</span>&gt;</span></div><div class="line">                <span class="tag">&lt;<span class="name">name</span>&gt;</span>dfs.namenode.secondary.http-address<span class="tag">&lt;/<span class="name">name</span>&gt;</span></div><div class="line">                <span class="tag">&lt;<span class="name">value</span>&gt;</span>master:50090<span class="tag">&lt;/<span class="name">value</span>&gt;</span></div><div class="line">        <span class="tag">&lt;/<span class="name">property</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">property</span>&gt;</span></div><div class="line">                <span class="tag">&lt;<span class="name">name</span>&gt;</span>dfs.replication<span class="tag">&lt;/<span class="name">name</span>&gt;</span></div><div class="line">                <span class="comment">&lt;!-- 每个文件的备份个数，一般不大于3份。修改时删除本条注释 --&gt;</span></div><div class="line">                <span class="tag">&lt;<span class="name">value</span>&gt;</span>2<span class="tag">&lt;/<span class="name">value</span>&gt;</span></div><div class="line">        <span class="tag">&lt;/<span class="name">property</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">property</span>&gt;</span></div><div class="line">                <span class="tag">&lt;<span class="name">name</span>&gt;</span>dfs.namenode.name.dir<span class="tag">&lt;/<span class="name">name</span>&gt;</span></div><div class="line">                <span class="tag">&lt;<span class="name">value</span>&gt;</span>file:/usr/hadoop/tmp/dfs/name<span class="tag">&lt;/<span class="name">value</span>&gt;</span></div><div class="line">        <span class="tag">&lt;/<span class="name">property</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">property</span>&gt;</span></div><div class="line">                <span class="tag">&lt;<span class="name">name</span>&gt;</span>dfs.datanode.data.dir<span class="tag">&lt;/<span class="name">name</span>&gt;</span></div><div class="line">                <span class="tag">&lt;<span class="name">value</span>&gt;</span>file:/usr/hadoop/tmp/dfs/data<span class="tag">&lt;/<span class="name">value</span>&gt;</span></div><div class="line">        <span class="tag">&lt;/<span class="name">property</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">configuration</span>&gt;</span></div></pre></td></tr></table></figure></p>
+<h4 id="slaves"><a href="#slaves" class="headerlink" title="slaves"></a>slaves</h4><p>slaves文件主要用于指明哪些节点是从节点。<br>由于我们已经配置过hosts文件了，可以直接使用各个机器的别名。如果你没有配置过hosts，应该将下面的别名替换成对应的IP。<br>每个机器名（或IP）独立占一行。我这里将master也写在里面，表示master机器也作为一个节点来使用。<br><figure class="highlight crmsh"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="literal">master</span></div><div class="line">slave1</div><div class="line">slave2</div></pre></td></tr></table></figure></p>
+<h3 id="启动和关闭HDFS"><a href="#启动和关闭HDFS" class="headerlink" title="启动和关闭HDFS"></a>启动和关闭HDFS</h3><p>配置完成之后，我们就可以使用HDFS了。<br>第一次使用HDFS，需要对其进行格式化以写入DFS文件系统。执行：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="meta">$</span><span class="bash"> hdfs namenode -format</span></div></pre></td></tr></table></figure></p>
+<p>格式化完成后执行以下命令来启动HDFS和YARN：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="meta">$</span><span class="bash"> start-dfs.sh</span></div><div class="line"><span class="meta">$</span><span class="bash"> start-yarn.sh</span></div></pre></td></tr></table></figure></p>
+<p>如果一切正常不报错就说明启动完成。这个时候可以访问<a href="http://master:50070" target="_blank" rel="external">http://master:50070</a>或者<code>http://master_IP:50070</code>就可以查看Hadoop的运行状态。</p>
+<p>如果要关闭HDFS要逆着上面的顺序执行以下命令：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="meta">$</span><span class="bash"> stop-yarn.sh</span></div><div class="line"><span class="meta">$</span><span class="bash"> stop-dfs.sh</span></div></pre></td></tr></table></figure></p>
+<h3 id="HDFS的简单常用命令"><a href="#HDFS的简单常用命令" class="headerlink" title="HDFS的简单常用命令"></a>HDFS的简单常用命令</h3><p>HDFS的命令和Linux的文件操作命令十分相似，就连许多命令的参数用法都是一致的。</p>
+<p>创建文件夹：</p>
+<pre><code># 创建一个文件夹
+$ hadoop fs -mkdir /new_dir
+
+# 允许同时创建多个文件夹
+$ hadoop fs -mkdir /new_dir1 new_dir2
+
+# 创建一个多级深度的文件夹
+$ hadoop fs -mkdir -p data/new_dir/new_deepper_dir
+</code></pre><p>上传文件：</p>
+<pre><code># 上传文件到指定文件夹
+$ hadoop fs -put localfile /user/hadoop/hadoopdir
+
+# 支持同时上传多个文件到指定文件夹
+$ hadoop fs -put localfile1 localfile2 /user/hadoop/hadoopdir
+</code></pre><p>查询文件：<br>    $ hadoop fs -ls <args></args></p>
+<p>下载文件：</p>
+<pre><code># 将文件下载到本地，同时保留HDFS文件
+$ hadoop fs -get /user/hadoop/file localfile
+</code></pre><p>删除文件：</p>
+<pre><code># 删除指定文件
+$ hadoop fs -rm /data/filename
+</code></pre><p>还有一些其他的文件操作命令请参考<a href="http://hadoop.apache.org/docs/r1.0.4/cn/hdfs_shell.html" target="_blank" rel="external">《Hadoop Shell命令》</a>。</p>
+<p>到此我们配置完了Hadoop的HDFS，如需继续进行，可以参见<a href="http://mrliao.cn/2017/03/16/Spark集群配置（3）：安装Spark" target="_blank" rel="external">Spark集群配置（3）：安装Spark</a></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Spark/" rel="tag"># Spark</a>
+          
+            <a href="/tags/Hadoop/" rel="tag"># Hadoop</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/03/16/Spark集群配置（3）：安装Spark/" rel="next" title="Spark集群配置（3）：安装Spark">
+                <i class="fa fa-chevron-left"></i> Spark集群配置（3）：安装Spark
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/03/16/Spark集群配置（1）：基础配置/" rel="prev" title="Spark集群配置（1）：基础配置">
+                Spark集群配置（1）：基础配置 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+          
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/uploads/avatar.jpg"
+               alt="LIAO" />
+          <p class="site-author-name" itemprop="name">LIAO</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+        
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">10</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">10</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/mrliaocn" target="_blank" title="Github">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Github
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/u/3248752395" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  Weibo
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#为什么要安装Hadoop"><span class="nav-number">2.</span> <span class="nav-text">为什么要安装Hadoop</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#下载Hadoop"><span class="nav-number">3.</span> <span class="nav-text">下载Hadoop</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装Hadoop"><span class="nav-number">4.</span> <span class="nav-text">安装Hadoop</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置环境变量"><span class="nav-number">5.</span> <span class="nav-text">配置环境变量</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置Hadoop"><span class="nav-number">6.</span> <span class="nav-text">配置Hadoop</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#hadoop-env-sh"><span class="nav-number">6.1.</span> <span class="nav-text">hadoop-env.sh</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#core-site-xml"><span class="nav-number">6.2.</span> <span class="nav-text">core-site.xml</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#yarn-site-xml"><span class="nav-number">6.3.</span> <span class="nav-text">yarn-site.xml</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#hdfs-site-xml"><span class="nav-number">6.4.</span> <span class="nav-text">hdfs-site.xml</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#slaves"><span class="nav-number">6.5.</span> <span class="nav-text">slaves</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#启动和关闭HDFS"><span class="nav-number">7.</span> <span class="nav-text">启动和关闭HDFS</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#HDFS的简单常用命令"><span class="nav-number">8.</span> <span class="nav-text">HDFS的简单常用命令</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LIAO</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+  
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="cdn.bootcss.com/mathjax/2.7.1/MathJax.js"></script>
+  
+
+
+  
+
+  
+
+  
+
+
+  
+
+</body>
+</html>

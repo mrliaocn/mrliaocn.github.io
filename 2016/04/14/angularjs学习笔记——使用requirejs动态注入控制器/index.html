@@ -1,0 +1,703 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="angularjs,requirejs," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="最近一段时间在学习angularjs，由于觉得直接使用它需要加载很多的js文件，因此想使用requirejs来实现异步加载，并动态注入控制器。简单搜索了下发现好多教程写的都很复杂，所以打算写一下我的方法，算是学习笔记了。 demo目录如下图： index.html文件的内容：123456789101112131415&amp;lt;!-- index.html --&amp;gt;&amp;lt;!DOCTYPE htm">
+<meta name="keywords" content="angularjs,requirejs">
+<meta property="og:type" content="article">
+<meta property="og:title" content="angularjs学习笔记——使用requirejs动态注入控制器">
+<meta property="og:url" content="http://127.0.0.1:4000/2016/04/14/angularjs学习笔记——使用requirejs动态注入控制器/index.html">
+<meta property="og:site_name" content="Mr. Liao">
+<meta property="og:description" content="最近一段时间在学习angularjs，由于觉得直接使用它需要加载很多的js文件，因此想使用requirejs来实现异步加载，并动态注入控制器。简单搜索了下发现好多教程写的都很复杂，所以打算写一下我的方法，算是学习笔记了。 demo目录如下图： index.html文件的内容：123456789101112131415&amp;lt;!-- index.html --&amp;gt;&amp;lt;!DOCTYPE htm">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://127.0.0.1:4000/images/angularjs-demo1.PNG">
+<meta property="og:updated_time" content="2016-04-14T14:15:00.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="angularjs学习笔记——使用requirejs动态注入控制器">
+<meta name="twitter:description" content="最近一段时间在学习angularjs，由于觉得直接使用它需要加载很多的js文件，因此想使用requirejs来实现异步加载，并动态注入控制器。简单搜索了下发现好多教程写的都很复杂，所以打算写一下我的方法，算是学习笔记了。 demo目录如下图： index.html文件的内容：123456789101112131415&amp;lt;!-- index.html --&amp;gt;&amp;lt;!DOCTYPE htm">
+<meta name="twitter:image" content="http://127.0.0.1:4000/images/angularjs-demo1.PNG">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"right","display":"hide","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://127.0.0.1:4000/2016/04/14/angularjs学习笔记——使用requirejs动态注入控制器/"/>
+
+
+
+
+
+  <title> angularjs学习笔记——使用requirejs动态注入控制器 | Mr. Liao </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-right page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Mr. Liao</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://127.0.0.1:4000/2016/04/14/angularjs学习笔记——使用requirejs动态注入控制器/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LIAO">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/uploads/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Mr. Liao">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                angularjs学习笔记——使用requirejs动态注入控制器
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-04-14T22:15:00+08:00">
+                2016-04-14
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>最近一段时间在学习<code>angularjs</code>，由于觉得直接使用它需要加载很多的js文件，因此想使用<code>requirejs</code>来实现异步加载，并动态注入控制器。简单搜索了下发现好多教程写的都很复杂，所以打算写一下我的方法，算是学习笔记了。</p>
+<p>demo目录如下图：<br><img src="/images/angularjs-demo1.PNG" alt="demo目录结构"></p>
+<p><code>index.html</code>文件的内容：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line"><span class="comment">&lt;!-- index.html --&gt;</span></div><div class="line"><span class="meta">&lt;!DOCTYPE html&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">html</span> <span class="attr">lang</span>=<span class="string">"en"</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">head</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">meta</span> <span class="attr">charset</span>=<span class="string">"UTF-8"</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">title</span>&gt;</span>demo<span class="tag">&lt;/<span class="name">title</span>&gt;</span></div><div class="line">    </div><div class="line">    <span class="comment">&lt;!-- 引入requirejs，并在main.js中初始化 --&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">script</span> <span class="attr">data-main</span>=<span class="string">"main.js"</span> <span class="attr">src</span>=<span class="string">"libs/require.js"</span>&gt;</span><span class="undefined"></span></div><div class="line"><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">head</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">div</span> <span class="attr">ng-view</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></div></pre></td></tr></table></figure></p>
+<p>在引入<code>main.js</code>后，就需要在其中完成<code>requirejs</code>的初始化：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// main.js</span></div><div class="line"></div><div class="line"><span class="meta">'use strict'</span>;</div><div class="line"></div><div class="line">(<span class="function"><span class="keyword">function</span> (<span class="params">win</span>) </span>&#123;</div><div class="line">    <span class="built_in">require</span>.config(&#123;</div><div class="line">        baseUrl: <span class="string">'./'</span>,</div><div class="line">        <span class="comment">// 依赖相对路径</span></div><div class="line">        paths: &#123;               </div><div class="line">            <span class="string">'angular'</span>: <span class="string">'libs/angular.min'</span>,</div><div class="line">            <span class="string">'angular-route'</span>: <span class="string">'libs/angular-route.min'</span></div><div class="line">        &#125;,</div><div class="line">        <span class="comment">// 引入没有使用requirejs模块写法的类库</span></div><div class="line">        shim: &#123;</div><div class="line">            <span class="string">'angular'</span>: &#123;</div><div class="line">                exports: <span class="string">'angular'</span></div><div class="line">            &#125;,</div><div class="line">            <span class="string">'angular-route'</span>: &#123;</div><div class="line">                <span class="comment">// angular-route依赖angular</span></div><div class="line">                deps: [<span class="string">'angular'</span>],</div><div class="line">                exports: <span class="string">'ngRoute'</span></div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    &#125;);</div><div class="line">    </div><div class="line">    <span class="comment">// 自动导入router.js模块，由于后缀名可以省略，故写作'router',</span></div><div class="line">    <span class="comment">// 并将模块返回的结果赋予到router中。</span></div><div class="line">    <span class="built_in">require</span>([<span class="string">'angular'</span>,<span class="string">'router'</span>], <span class="function"><span class="keyword">function</span>(<span class="params">angular,router</span>)</span>&#123;</div><div class="line">        <span class="comment">// 手动启动angularjs，特别说明此处的bootstrap不是那个ui框架，</span></div><div class="line">        <span class="comment">// 而是angularjs的一个手动启动框架的函数</span></div><div class="line">        angular.bootstrap(<span class="built_in">document</span>, [<span class="string">'blogApp'</span>]);</div><div class="line">    &#125;);</div><div class="line">&#125;)(<span class="built_in">window</span>);</div></pre></td></tr></table></figure></p>
+<p><code>main.js</code>中完成了各模块的初始化，并且引入了<code>router.js</code>。<br>下面我们在<code>router.js</code>中配置路由：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// router.js</span></div><div class="line"></div><div class="line">define([<span class="string">'angular'</span>, <span class="string">'require'</span>, <span class="string">'angular-route'</span>], <span class="function"><span class="keyword">function</span> (<span class="params">angular, require</span>) </span>&#123;</div><div class="line"></div><div class="line">    <span class="keyword">var</span> blogApp = angular.module(<span class="string">'blogApp'</span>,[<span class="string">'ngRoute'</span>]);</div><div class="line"></div><div class="line">    blogApp.config([<span class="string">'$routeProvider'</span>,<span class="string">'$controllerProvider'</span>,</div><div class="line">        <span class="function"><span class="keyword">function</span>(<span class="params">$routeProvider,$controllerProvider</span>) </span>&#123;</div><div class="line">            $routeProvider</div><div class="line">            .when(<span class="string">'/'</span>, &#123;</div><div class="line">                templateUrl:<span class="string">'templates/list.html'</span>,</div><div class="line">                controller: <span class="string">'ListCtrl'</span>,</div><div class="line">                resolve:&#123;</div><div class="line">                    delay : ctrlRegister(<span class="string">'ListCtrl'</span>,[<span class="string">'controllers/ListCtrl.js'</span>])</div><div class="line">                &#125;</div><div class="line">            &#125;)</div><div class="line">            .when(<span class="string">'/data'</span>, &#123;</div><div class="line">                templateUrl:<span class="string">'templates/data.html'</span>,</div><div class="line">                controller: <span class="string">'DataCtrl'</span>,</div><div class="line">                resolve:&#123;</div><div class="line">                    delay : ctrlRegister(<span class="string">'DataCtrl'</span>,[<span class="string">'controllers/DataCtrl.js'</span>])</div><div class="line">                &#125;</div><div class="line">            &#125;)</div><div class="line">            .otherwise(&#123;</div><div class="line">                redirectTo: <span class="string">'/'</span></div><div class="line">            &#125;);</div><div class="line"></div><div class="line">            <span class="function"><span class="keyword">function</span> <span class="title">ctrlRegister</span> (<span class="params">ctrlName, ctrlModule</span>) </span>&#123;</div><div class="line">                <span class="keyword">return</span> <span class="function"><span class="keyword">function</span> (<span class="params">$q</span>) </span>&#123;</div><div class="line">                    <span class="keyword">var</span> defer = $q.defer();</div><div class="line">                    <span class="built_in">require</span>(ctrlModule, <span class="function"><span class="keyword">function</span> (<span class="params">controller</span>) </span>&#123;</div><div class="line"></div><div class="line">                        $controllerProvider.register(ctrlName, controller);</div><div class="line"></div><div class="line">                        defer.resolve();</div><div class="line">                    &#125;);</div><div class="line">                    <span class="keyword">return</span> defer.promise;</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    ]);</div><div class="line"></div><div class="line">    <span class="keyword">return</span> blogApp;</div><div class="line">&#125;);</div></pre></td></tr></table></figure></p>
+<p>我把这里面拆为分三个部分来说<br>第一部分：定义该模块<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 引入3个基础模块</span></div><div class="line">define([<span class="string">'angular'</span>, <span class="string">'require'</span>, <span class="string">'angular-route'</span>], <span class="function"><span class="keyword">function</span> (<span class="params">angular, require</span>) </span>&#123;</div><div class="line">    </div><div class="line">    <span class="comment">// 定义整个demo为一个名为blogApp的模块</span></div><div class="line">    <span class="keyword">var</span> blogApp = angular.module(<span class="string">'blogApp'</span>,[<span class="string">'ngRoute'</span>]);</div><div class="line">    </div><div class="line">    <span class="comment">// ...第二部分：路由配置...</span></div><div class="line">    <span class="comment">// ...第三部分：复用的动态注入控制器函数</span></div><div class="line">    </div><div class="line">    <span class="comment">// 向main.js返回这个blogApp</span></div><div class="line">    <span class="keyword">return</span> blogApp;</div><div class="line">&#125;);</div></pre></td></tr></table></figure></p>
+<p>第二部分：设置基础路由<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">blogApp.config([<span class="string">'$routeProvider'</span>,<span class="string">'$controllerProvider'</span>,</div><div class="line">        <span class="function"><span class="keyword">function</span>(<span class="params">$routeProvider,$controllerProvider</span>) </span>&#123;</div><div class="line">            $routeProvider</div><div class="line">            .when(<span class="string">'/'</span>, &#123;</div><div class="line">                <span class="comment">// 模板地址</span></div><div class="line">                templateUrl:<span class="string">'templates/list.html'</span>,</div><div class="line">                <span class="comment">// 控制器的名字</span></div><div class="line">                controller: <span class="string">'ListCtrl'</span>,</div><div class="line">                <span class="comment">// resolve用来在完成路由前处理一些事</span></div><div class="line">                <span class="comment">// 这里用来动态加载并注入相应的控制器</span></div><div class="line">                resolve:&#123;</div><div class="line">                    <span class="comment">// ctrlRegister为我自己写的一个复用的函数，</span></div><div class="line">                    <span class="comment">// 用于注入控制器。见第三部分</span></div><div class="line">                    delay : ctrlRegister(<span class="string">'ListCtrl'</span>,[<span class="string">'controllers/ListCtrl.js'</span>])</div><div class="line">                &#125;</div><div class="line">            &#125;);</div><div class="line">       &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>第三部分：复用的控制器注入函数<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 该函数接受两个参数</span></div><div class="line"><span class="comment">// ctrlName，字符串类型，为该控制器的名字</span></div><div class="line"><span class="comment">// ctrlModule，字符串数组类型，为要引入的控制器的相对地址</span></div><div class="line"><span class="comment">// 调用例如 ctrlRegister('ListCtrl',['controllers/ListCtrl.js'])</span></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">ctrlRegister</span> (<span class="params">ctrlName, ctrlModule</span>) </span>&#123;</div><div class="line"></div><div class="line">    <span class="keyword">return</span> <span class="function"><span class="keyword">function</span> (<span class="params">$q</span>) </span>&#123;</div><div class="line">        <span class="keyword">var</span> defer = $q.defer();</div><div class="line">        <span class="comment">// 加载该控制器，并将返回值赋给controller，返回值一般是一个控制器函数</span></div><div class="line">        <span class="built_in">require</span>(ctrlModule, <span class="function"><span class="keyword">function</span> (<span class="params">controller</span>) </span>&#123;</div><div class="line">            <span class="comment">// 将返回值注册为名称为ctrlName的控制器</span></div><div class="line">            $controllerProvider.register(ctrlName, controller);</div><div class="line"></div><div class="line">            defer.resolve();</div><div class="line">        &#125;);</div><div class="line">        <span class="comment">// 完成注册</span></div><div class="line">        <span class="keyword">return</span> defer.promise;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>好了，这样就完成了动态加载的功能了，下面就可以写要动态加载的控制器了<br>用其中一个控制器<code>ListCtrl.js</code>来说明问题：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// ListCtrl.js</span></div><div class="line"></div><div class="line"><span class="comment">// 加载angular模块</span></div><div class="line">define([<span class="string">'angular'</span>], <span class="function"><span class="keyword">function</span> (<span class="params">angular</span>) </span>&#123;</div><div class="line">    将本控制器函数作为结果返回给router.js</div><div class="line">    <span class="keyword">return</span> <span class="function"><span class="keyword">function</span> <span class="title">ListCtrl</span>(<span class="params"> $scope </span>)</span>&#123;</div><div class="line">        $scope.lists = [<span class="string">'1'</span>,<span class="string">'2'</span>,<span class="string">'3'</span>];</div><div class="line">    &#125;;</div><div class="line">&#125;);</div></pre></td></tr></table></figure></p>
+<p>剩下的事情就是在<code>list.html</code>中接收控制器传送的数据了：<br><figure class="highlight django"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="xml"><span class="comment">&lt;!-- list.html --&gt;</span></span></div><div class="line"><span class="xml"><span class="tag">&lt;<span class="name">ul</span>&gt;</span></span></div><div class="line"><span class="xml">    <span class="tag">&lt;<span class="name">li</span> <span class="attr">ng-repeat</span>=<span class="string">"list in lists"</span>&gt;</span><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"#/</span></span></span><span class="template-variable">&#123;&#123;list&#125;&#125;</span><span class="xml"><span class="tag"><span class="string">"</span> <span class="attr">ng-bind</span>=<span class="string">"list"</span>&gt;</span><span class="tag">&lt;/<span class="name">a</span>&gt;</span><span class="tag">&lt;/<span class="name">li</span>&gt;</span></span></div><div class="line"><span class="xml"><span class="tag">&lt;/<span class="name">ul</span>&gt;</span></span></div></pre></td></tr></table></figure></p>
+<p>最终实现的功能是：<br>比如我访问<code>http://127.0.0.1/b06-blog/#/</code>只会加载<code>list.html</code>和<code>ListCtrl.js</code>；<br>而当访问<code>http://127.0.0.1/b06-blog/#/data</code>就只会加载<code>data.html</code>和<code>DataCtrl.js</code>。<br>这样做有什么好处呢？当有很多控制器时，可以按需加载相应的控制器，不会一股脑全部加载上来（看起来依然并没有什么卵用）。<br>很惭愧，只为大家节约了一点微小的带宽，谢谢大家。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/angularjs/" rel="tag"># angularjs</a>
+          
+            <a href="/tags/requirejs/" rel="tag"># requirejs</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/04/04/markdown笔记/" rel="next" title="Markdown 笔记">
+                <i class="fa fa-chevron-left"></i> Markdown 笔记
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/06/17/使用python发送邮件/" rel="prev" title="使用Python发送邮件">
+                使用Python发送邮件 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+          
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview sidebar-panel sidebar-panel-active">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/uploads/avatar.jpg"
+               alt="LIAO" />
+          <p class="site-author-name" itemprop="name">LIAO</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+        
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">10</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">10</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/mrliaocn" target="_blank" title="Github">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Github
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/u/3248752395" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  Weibo
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LIAO</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+  
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="cdn.bootcss.com/mathjax/2.7.1/MathJax.js"></script>
+  
+
+
+  
+
+  
+
+  
+
+
+  
+
+</body>
+</html>

@@ -1,0 +1,790 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="机器学习," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="本文翻译自Calculus on Computational Graphs: Backpropagation，文章句子表述有变化，但尽量保持了内容一致。 简介（Introduction）反向传播算法是训练深度网络模型的关键算法，它和梯度下降算法一起使用时，相较于原始的方法，可以使神经网络的训练速度快上千万倍以上。直观的对比是对于一个模型训练的时间消耗，用与不用的差别可能是一周与二十200,000年">
+<meta name="keywords" content="机器学习">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【翻译】反向传播算法：使用图计算求微分">
+<meta property="og:url" content="http://127.0.0.1:4000/2017/07/31/【翻译】反向传播算法：使用图计算求微分/index.html">
+<meta property="og:site_name" content="Mr. Liao">
+<meta property="og:description" content="本文翻译自Calculus on Computational Graphs: Backpropagation，文章句子表述有变化，但尽量保持了内容一致。 简介（Introduction）反向传播算法是训练深度网络模型的关键算法，它和梯度下降算法一起使用时，相较于原始的方法，可以使神经网络的训练速度快上千万倍以上。直观的对比是对于一个模型训练的时间消耗，用与不用的差别可能是一周与二十200,000年">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://colah.github.io/posts/2015-08-Backprop/img/tree-def.png">
+<meta property="og:image" content="http://colah.github.io/posts/2015-08-Backprop/img/tree-eval.png">
+<meta property="og:image" content="https://i.loli.net/2017/07/31/597ed6787087c.png">
+<meta property="og:image" content="http://colah.github.io/posts/2015-08-Backprop/img/tree-eval-derivs.png">
+<meta property="og:image" content="https://i.loli.net/2017/07/31/597edc9c3d8f7.png">
+<meta property="og:image" content="http://colah.github.io/posts/2015-08-Backprop/img/chain-def-greek.png">
+<meta property="og:image" content="https://i.loli.net/2017/07/31/597ee01b19d79.png
+">
+<meta property="og:image" content="https://i.loli.net/2017/07/31/597ee1465a4bb.png
+">
+<meta property="og:image" content="http://colah.github.io/posts/2015-08-Backprop/img/chain-forward-greek.png
+">
+<meta property="og:image" content="http://colah.github.io/posts/2015-08-Backprop/img/chain-backward-greek.png
+">
+<meta property="og:image" content="http://colah.github.io/posts/2015-08-Backprop/img/tree-eval-derivs.png
+">
+<meta property="og:image" content="http://colah.github.io/posts/2015-08-Backprop/img/tree-forwradmode.png
+">
+<meta property="og:image" content="http://colah.github.io/posts/2015-08-Backprop/img/tree-backprop.png
+">
+<meta property="og:updated_time" content="2017-07-31T12:00:56.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="【翻译】反向传播算法：使用图计算求微分">
+<meta name="twitter:description" content="本文翻译自Calculus on Computational Graphs: Backpropagation，文章句子表述有变化，但尽量保持了内容一致。 简介（Introduction）反向传播算法是训练深度网络模型的关键算法，它和梯度下降算法一起使用时，相较于原始的方法，可以使神经网络的训练速度快上千万倍以上。直观的对比是对于一个模型训练的时间消耗，用与不用的差别可能是一周与二十200,000年">
+<meta name="twitter:image" content="http://colah.github.io/posts/2015-08-Backprop/img/tree-def.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"right","display":"hide","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://127.0.0.1:4000/2017/07/31/【翻译】反向传播算法：使用图计算求微分/"/>
+
+
+
+
+
+  <title> 【翻译】反向传播算法：使用图计算求微分 | Mr. Liao </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-right page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Mr. Liao</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://127.0.0.1:4000/2017/07/31/【翻译】反向传播算法：使用图计算求微分/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LIAO">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/uploads/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Mr. Liao">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                【翻译】反向传播算法：使用图计算求微分
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-07-31T11:23:20+08:00">
+                2017-07-31
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><em>本文翻译自<a href="http://colah.github.io/posts/2015-08-Backprop/" target="_blank" rel="external">Calculus on Computational Graphs: Backpropagation</a>，文章句子表述有变化，但尽量保持了内容一致。</em></p>
+<h3 id="简介（Introduction）"><a href="#简介（Introduction）" class="headerlink" title="简介（Introduction）"></a>简介（Introduction）</h3><p>反向传播算法是训练深度网络模型的关键算法，它和梯度下降算法一起使用时，相较于原始的方法，可以使神经网络的训练速度快上千万倍以上。直观的对比是对于一个模型训练的时间消耗，用与不用的差别可能是一周与二十200,000年。</p>
+<p>反向传播算法不仅仅被用于深度学习，在其他领域里它也是一个有力的工具，从天气预测到数值稳定性分析都离不开它——区别在不同领域中有不同的名字。事实上，这个算法在不同领域里至少被改进过十多次了（参见<a href="http://www.math.uiuc.edu/documenta/vol-ismp/52_griewank-andreas-b.pdf" target="_blank" rel="external">Griewank (2010)</a>）。总的来说，不考虑其应用场景的话，一般被叫做“反向模式微分”。</p>
+<p>从根本上来讲，它只是一种快速求微分的方法，但却是在深度学习以及其他的数值计算领域中，必不可少的一项技术。</p>
+<h3 id="计算图（Computational-Graphs）"><a href="#计算图（Computational-Graphs）" class="headerlink" title="计算图（Computational Graphs）"></a>计算图（Computational Graphs）</h3><p>计算图是一种有效的用于考察数学表达式的方法。举个例子，在表达式 <code>e = (a+b)*(b+1)</code> 中，一共有2个加法、1个乘法。我们定义两个中间变量 <code>c</code>和 <code>d</code>，将计算流程改造如下：</p>
+<figure class="highlight ini"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="attr">c</span> = a + b</div><div class="line"><span class="attr">d</span> = b + <span class="number">1</span></div><div class="line"><span class="attr">e</span> = c * d</div></pre></td></tr></table></figure>
+<p>将上面的三个操作转化为节点，每个节点接受操作的输入。节点间的箭头从上一操作节点指向下一操作节点，从而构建一个计算图：</p>
+<p><img src="http://colah.github.io/posts/2015-08-Backprop/img/tree-def.png" alt="tree-def.png" title="tree-def.png" width="400px"></p>
+<p>这种图在计算机科学中很常见，特别是在函数式编程中，比较类似于依赖关系图或者是调用图。这种图更是著名的深度学习框架<code>Theano</code>的核心抽象内容。</p>
+<p>通过对图的输入赋值，我们可以通过一层一层的向上计算得到图的输出，例如设定输入 <code>a=2</code>，<code>b=1</code>，则得到输出为<code>e=6</code>。</p>
+<p><img src="http://colah.github.io/posts/2015-08-Backprop/img/tree-eval.png" width="400px"></p>
+<h3 id="计算图上的微分（Derivatives-on-Computational-Graphs）"><a href="#计算图上的微分（Derivatives-on-Computational-Graphs）" class="headerlink" title="计算图上的微分（Derivatives on Computational Graphs）"></a>计算图上的微分（Derivatives on Computational Graphs）</h3><p>如果你想了解计算图上是如何微分的，那么你需要从图中的<strong>箭头</strong>开始探究。比如<code>a</code>可以影响<code>c</code>的值，那么它是如何影响的呢？我们可以通过给<code>a</code>一个很小的变化来观察<code>c</code>的变化。这就是我们所谓的<a href="https://en.wikipedia.org/wiki/Partial_derivative" target="_blank" rel="external">偏导数</a>的由来。</p>
+<p>为了计算这个图，我们需要先准备两个求导法则：<a href="https://en.wikipedia.org/wiki/Sum_rule_in_differentiation" target="_blank" rel="external">加法法则</a>和<a href="https://en.wikipedia.org/wiki/Product_rule" target="_blank" rel="external">乘法法则</a>，在这里应用这两个法则有：</p>
+<p><img src="https://i.loli.net/2017/07/31/597ed6787087c.png" width="300px"></p>
+<p>这样在图的每个箭头上都有了一个偏导数标签：</p>
+<p><img src="http://colah.github.io/posts/2015-08-Backprop/img/tree-eval-derivs.png" width="400px"></p>
+<p>那么问题来了，那些不直接连接的节点是如何互相影响的呢？我们考察<code>e</code>与<code>a</code>的关系，假设上图中<code>a</code>以加1的速度增长，那么<code>c</code>会随着也以加1的速度增长，而<code>e</code>会随着<code>c</code>的增长而以加2的速度增长。从而可以得到<code>e</code>会随着<code>a</code>的变化以2倍的速度随之变化，即<code>e</code>关于<code>a</code>的偏导数为2。（假设b=1不变）</p>
+<p>从图中观察这个规律是将起点与终点之间的所有路径遍历，每条路径中箭头上的偏导相乘，再将每个路径的值相加。这样来计算<code>e</code>对于<code>b</code>的偏导数有：</p>
+<p><img src="https://i.loli.net/2017/07/31/597edc9c3d8f7.png" width="300px"></p>
+<p>这就是<code>b</code>如何通过<code>c</code>与<code>d</code>来影响<code>e</code>的，这种<strong><code>将所有路径的结果相加</code></strong>的方法就是我们在求导中使用的<strong><a href="https://en.wikipedia.org/wiki/Chain_rule#Higher_dimensions" target="_blank" rel="external">多变量链式求导</a></strong>方法的另一种展现。</p>
+<h3 id="权值路径（Factoring-Paths）"><a href="#权值路径（Factoring-Paths）" class="headerlink" title="权值路径（Factoring Paths）"></a>权值路径（Factoring Paths）</h3><p>上面的方法很简单，但是很容易导致路径规模爆炸。一个简单的例子，下图X到Y有三条路径，Y到Z又有三条路径，那么X到Z一共有九条路径。</p>
+<p><img src="http://colah.github.io/posts/2015-08-Backprop/img/chain-def-greek.png" width="400px"></p>
+<p>那么在求偏导数时，就会有如下的形式。但是当整个图变得复杂的时候，这个加法的式子会越来越复杂。路径的个数会随着复杂度以几何级数形式增长。<br><img src="https://i.loli.net/2017/07/31/597ee01b19d79.png
+" width="500px"></p>
+<p>不妨换一种表达方法，这样看起来比上面好多了。</p>
+<p><img src="https://i.loli.net/2017/07/31/597ee1465a4bb.png
+" width="300px"></p>
+<p>从上式的思想中我们可以引入<strong><code>前向微分</code></strong>和<strong><code>反向微分</code></strong>的概念了，它们都是计算路径权值和的高效算法。这两个算法不是简单地将路径值相加，而是通过合并节点的方法来高效计算总和，事实上，这两个算法只会对每个箭头处理一次。（简单的路径相加会多次计算同一个箭头）</p>
+<p><strong><code>前向微分</code></strong>就是从输入开始，沿着图的方向计算直到结束。在途经的每个节点，将该节点的所有输入相加，这样就获得了该节点对所有输入变化的反馈，即微分值。然后继续向后移动，重复上述方法，最终计算出最终结果。</p>
+<p><img src="http://colah.github.io/posts/2015-08-Backprop/img/chain-forward-greek.png
+" width="400px"></p>
+<p><strong><code>反向微分</code></strong>则是从输出节点开始，逆着图的方向反着计算每个节点对最终输出的影响，即该节点对最终输出的偏导值。</p>
+<p><img src="http://colah.github.io/posts/2015-08-Backprop/img/chain-backward-greek.png
+" width="400px"></p>
+<p>简单的说这两种方法，其实就是：前者是对每个节点计算 <code>d/dx</code>，而后者则是对每个节点计算<code>dz/d</code></p>
+<h3 id="快捷计算（Computational-Victories）"><a href="#快捷计算（Computational-Victories）" class="headerlink" title="快捷计算（Computational Victories）"></a>快捷计算（Computational Victories）</h3><p>说到这里，你估计还在觉得这两种算法如此相似，为什么大家更关心<strong><code>反向微分</code></strong>呢？和<strong><code>前向微分</code></strong>相比它的计算方法很别扭，难道它有特别的优势吗？</p>
+<p>让我们再来考虑文章最开始提出的例子：</p>
+<p><img src="http://colah.github.io/posts/2015-08-Backprop/img/tree-eval-derivs.png
+" width="400px"></p>
+<p>我们使用<strong><code>前向微分</code></strong>来计算<code>e</code>对于<code>b</code>的偏微分值，由此我们需要计算出图中所有节点对<code>b</code>的偏微分值，当计算到达顶点时，可以获得<strong><code>一个</code></strong>偏微分结果，即<code>de/db = 5</code>：</p>
+<p><img src="http://colah.github.io/posts/2015-08-Backprop/img/tree-forwradmode.png
+" width="400px"></p>
+<p>但我们来使用<strong><code>反向微分</code></strong>来计算同样的任务时，我们会计算出<code>e</code>对于图中所有节点的偏微分值，但计算到达底端时，我们获得了<strong><code>两个</code></strong>偏微分结果，即<code>de/da=2</code>与<code>de/db=5</code>：</p>
+<p><img src="http://colah.github.io/posts/2015-08-Backprop/img/tree-backprop.png
+" width="400px"></p>
+<p>看到没有，这个差别十分明显，<strong><code>前向微分</code></strong>一次只能计算输出关于一个输入参数的偏导数，而<strong><code>反向微分</code></strong>则可以计算出关于<strong><code>所有</code></strong>输入的偏导数，而且还有中间节点的偏导数（即中间节点对输出的影响）。</p>
+<p>这个图中只有两个参数，因此可能影响不大，但是假设有一百万个输入和一个输出的系统中，前向微分需要我们通过数一百万次重复计算来获得偏导数，而反向微分则只需一次！一百万的加速是相当不错的！</p>
+<p>而针对神经网络，我们一般会在输出时计算损失函数来评价网络的好坏，来针对网络中的许许多多参数进行优化，这正好是符合<strong><code>很多输入，一个输出</code></strong>的模型，使用反向微分可以直接一次计算出所有参数对输出的影响（梯度），从而将整个系统的计算速度大大提升。</p>
+<p>说到这里，当然我们也可以得出一个结论：前向微分也有好用的时候，即当系统是<strong><code>一个输入，很多输出</code></strong>的时候。我想这个应该不难理解。</p>
+<h3 id="这个算法很难吗吗？（Isn’t-This-Trivial-）"><a href="#这个算法很难吗吗？（Isn’t-This-Trivial-）" class="headerlink" title="这个算法很难吗吗？（Isn’t This Trivial?）"></a>这个算法很难吗吗？（Isn’t This Trivial?）</h3><p>当我第一次搞明白反向传播算法时，我的第一感觉是“这不就是链式求导法则吗？没什么不得了的 啊，为什么他们花了那么久才搞出来这个算法？”事实上，我不是唯一这么想的人。如果你只是问：“有没有一种快速计算前馈神经网络中，参数的偏导数的方法？”，那么针对这个问题来找到这个算法作为答案确实很简单。（作者的意思是，如果你知道了你需要用偏导数来更新网络，你的目标明确了，那么你很容易找到这个算法。）</p>
+<p>但是，在反向传播算法被发明时，首先前馈神经网络本身就不被关注（译者注：当时神经网络受制于硬件条件，性能很差），而且由于没有反向微分算法，所以偏导数计算消耗很大，通过偏导数（梯度）来训练网络也不是主流思想，导致更加没有人研究反向传播算法，这是一个循环的困境。所以说哪怕是以今天的视角来看，这个算法在当时发明也是很厉害的。</p>
+<p>所以说这就是个事后诸葛亮的问题，一旦你知道了采用这种方法会有好的结果，那么其实就等于你找到了这种方法。事实是，在你不知道这个方法会有效，甚至并不知道这种方法存在时，你怎么去找到这个方法呢？这才是最难最牛逼的的部分。</p>
+<h3 id="结论（Conclusion）"><a href="#结论（Conclusion）" class="headerlink" title="结论（Conclusion）"></a>结论（Conclusion）</h3><p>下面就不翻译了，主要内容上面都讲完了。</p>
+<p>Derivatives are cheaper than you think. That’s the main lesson to take away from this post. In fact, they’re unintuitively cheap, and us silly humans have had to repeatedly rediscover this fact. That’s an important thing to understand in deep learning. It’s also a really useful thing to know in other fields, and only more so if it isn’t common knowledge.</p>
+<p>Are there other lessons? I think there are.</p>
+<p>Backpropagation is also a useful lens for understanding how derivatives flow through a model. This can be extremely helpful in reasoning about why some models are difficult to optimize. The classic example of this is the problem of vanishing gradients in recurrent neural networks.</p>
+<p>Finally, I claim there is a broad algorithmic lesson to take away from these techniques. Backpropagation and forward-mode differentiation use a powerful pair of tricks (linearization and dynamic programming) to compute derivatives more efficiently than one might think possible. If you really understand these techniques, you can use them to efficiently calculate several other interesting expressions involving derivatives. We’ll explore this in a later blog post.</p>
+<p>This post gives a very abstract treatment of backpropagation. I strongly recommend reading <a href="http://neuralnetworksanddeeplearning.com/chap2.html" target="_blank" rel="external">Michael Nielsen’s chapter on it</a> for an excellent discussion, more concretely focused on neural networks.</p>
+<h3 id="致谢（Acknowledgments）"><a href="#致谢（Acknowledgments）" class="headerlink" title="致谢（Acknowledgments）"></a>致谢（Acknowledgments）</h3><p>Thank you to Greg Corrado, Jon Shlens, Samy Bengio and Anelia Angelova for taking the time to proofread this post.</p>
+<p>Thanks also to Dario Amodei, Michael Nielsen and Yoshua Bengio for discussion of approaches to explaining backpropagation. Also thanks to all those who tolerated me practicing explaining backpropagation in talks and seminar series!</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/机器学习/" rel="tag"># 机器学习</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/03/16/Spark集群配置（1）：基础配置/" rel="next" title="Spark集群配置（1）：基础配置">
+                <i class="fa fa-chevron-left"></i> Spark集群配置（1）：基础配置
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+          
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/uploads/avatar.jpg"
+               alt="LIAO" />
+          <p class="site-author-name" itemprop="name">LIAO</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+        
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">10</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">10</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/mrliaocn" target="_blank" title="Github">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Github
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/u/3248752395" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  Weibo
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#简介（Introduction）"><span class="nav-number">1.</span> <span class="nav-text">简介（Introduction）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#计算图（Computational-Graphs）"><span class="nav-number">2.</span> <span class="nav-text">计算图（Computational Graphs）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#计算图上的微分（Derivatives-on-Computational-Graphs）"><span class="nav-number">3.</span> <span class="nav-text">计算图上的微分（Derivatives on Computational Graphs）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#权值路径（Factoring-Paths）"><span class="nav-number">4.</span> <span class="nav-text">权值路径（Factoring Paths）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#快捷计算（Computational-Victories）"><span class="nav-number">5.</span> <span class="nav-text">快捷计算（Computational Victories）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#这个算法很难吗吗？（Isn’t-This-Trivial-）"><span class="nav-number">6.</span> <span class="nav-text">这个算法很难吗吗？（Isn’t This Trivial?）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#结论（Conclusion）"><span class="nav-number">7.</span> <span class="nav-text">结论（Conclusion）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#致谢（Acknowledgments）"><span class="nav-number">8.</span> <span class="nav-text">致谢（Acknowledgments）</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LIAO</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+  
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="cdn.bootcss.com/mathjax/2.7.1/MathJax.js"></script>
+  
+
+
+  
+
+  
+
+  
+
+
+  
+
+</body>
+</html>

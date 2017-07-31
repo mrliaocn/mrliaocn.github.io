@@ -1,0 +1,733 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Spark," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="前言本文是《Spark集群配置》的第三篇。主要讲解安装Spark的步骤。其他的几篇传送门： . Spark集群配置（1）：基础配置. Spark集群配置（2）：安装Hadoop. Spark集群配置（4）：其他填坑杂项 本文要求读者有一定的Linux命令基础，并且在多台机器上完成了前篇中的基础配置。下面我们开始正文。 下载Spark请到Spark官网下载。下载时唯一需要注意的是要选择与之前安装的H">
+<meta name="keywords" content="Spark">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Spark集群配置（3）：安装Spark">
+<meta property="og:url" content="http://127.0.0.1:4000/2017/03/16/Spark集群配置（3）：安装Spark/index.html">
+<meta property="og:site_name" content="Mr. Liao">
+<meta property="og:description" content="前言本文是《Spark集群配置》的第三篇。主要讲解安装Spark的步骤。其他的几篇传送门： . Spark集群配置（1）：基础配置. Spark集群配置（2）：安装Hadoop. Spark集群配置（4）：其他填坑杂项 本文要求读者有一定的Linux命令基础，并且在多台机器上完成了前篇中的基础配置。下面我们开始正文。 下载Spark请到Spark官网下载。下载时唯一需要注意的是要选择与之前安装的H">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2017-03-16T08:44:00.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Spark集群配置（3）：安装Spark">
+<meta name="twitter:description" content="前言本文是《Spark集群配置》的第三篇。主要讲解安装Spark的步骤。其他的几篇传送门： . Spark集群配置（1）：基础配置. Spark集群配置（2）：安装Hadoop. Spark集群配置（4）：其他填坑杂项 本文要求读者有一定的Linux命令基础，并且在多台机器上完成了前篇中的基础配置。下面我们开始正文。 下载Spark请到Spark官网下载。下载时唯一需要注意的是要选择与之前安装的H">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"right","display":"hide","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://127.0.0.1:4000/2017/03/16/Spark集群配置（3）：安装Spark/"/>
+
+
+
+
+
+  <title> Spark集群配置（3）：安装Spark | Mr. Liao </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-right page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Mr. Liao</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://127.0.0.1:4000/2017/03/16/Spark集群配置（3）：安装Spark/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="LIAO">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/uploads/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Mr. Liao">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Spark集群配置（3）：安装Spark
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-03-16T16:44:00+08:00">
+                2017-03-16
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>本文是《Spark集群配置》的第三篇。主要讲解安装<code>Spark</code>的步骤。其他的几篇传送门：</p>
+<p>. <a href="http://mrliao.cn/2017/03/16/Spark集群配置（1）：基础配置" target="_blank" rel="external">Spark集群配置（1）：基础配置</a><br>. <a href="http://mrliao.cn/2017/03/16/Spark集群配置（2）：安装Hadoop" target="_blank" rel="external">Spark集群配置（2）：安装Hadoop</a><br>. <a href="http://mrliao.cn/2017/03/16/Spark集群配置（4）：其他填坑杂项" target="_blank" rel="external">Spark集群配置（4）：其他填坑杂项</a></p>
+<p>本文要求读者有一定的<code>Linux</code>命令基础，并且在多台机器上完成了前篇中的基础配置。下面我们开始正文。</p>
+<h3 id="下载Spark"><a href="#下载Spark" class="headerlink" title="下载Spark"></a>下载Spark</h3><p>请到<a href="http://spark.apache.org/" target="_blank" rel="external">Spark官网</a>下载。下载时唯一需要注意的是要选择与之前安装的Hadoop版本对应。<br>我安装的是<code>Hadoop 2.7.3</code>，因此我选择<code>Pre-bulit for Hadoop 2.7 and later</code>。建议选择最新版本的Spark，我这里使用的是<code>Spark 2.0.1</code>。<br>你也可以下载源码然后自己编译，但不推荐这么做。</p>
+<h3 id="安装Spark"><a href="#安装Spark" class="headerlink" title="安装Spark"></a>安装Spark</h3><p>在所有机器上执行以下命令安装：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="meta">$</span><span class="bash"> tar -xzvf spark-2.0.1-bin-hadoop2.7.tgz</span></div><div class="line"><span class="meta">$</span><span class="bash"> mv spark-2.0.1-bin-hadoop2.7 /usr/spark</span></div><div class="line"><span class="meta">$</span><span class="bash"> sudo chown spark:spark /usr/spark</span></div></pre></td></tr></table></figure></p>
+<h3 id="添加环境变量"><a href="#添加环境变量" class="headerlink" title="添加环境变量"></a>添加环境变量</h3><p>在所有机器上修改<code>/etc/profile</code>文件，添加以下内容：<br><figure class="highlight routeros"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="builtin-name">export</span> <span class="attribute">SPARK_HOME</span>=<span class="string">"/usr/spark"</span></div><div class="line"><span class="builtin-name">export</span> <span class="attribute">PATH</span>=<span class="string">"/usr/spark/bin:<span class="variable">$PATH</span>"</span></div><div class="line"><span class="builtin-name">export</span> <span class="attribute">PATH</span>=<span class="string">"/usr/spark/sbin:<span class="variable">$PATH</span>"</span></div><div class="line"></div><div class="line"><span class="comment"># 指定pyspark使用Python3+版本执行</span></div><div class="line"><span class="builtin-name">export</span> <span class="attribute">PYSPARK_PYTHON</span>=<span class="string">"python3"</span></div></pre></td></tr></table></figure></p>
+<p>添加完后执行命令立即更新记录。<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">source</span> /etc/profile</span></div></pre></td></tr></table></figure></p>
+<h3 id="配置Spark"><a href="#配置Spark" class="headerlink" title="配置Spark"></a>配置Spark</h3><p><code>Spark</code>的配置文件在<code>spark/conf/</code>中。我们主要配置以下几个文件：</p>
+<h4 id="log4j-properties"><a href="#log4j-properties" class="headerlink" title="log4j.properties"></a>log4j.properties</h4><p>这是Spark的日志输出配置文件。它是由模板文件<code>log4j.properties.template</code>生成的。<br>执行以下命令将模板文件复制一份并重命名：<br><figure class="highlight stylus"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ cp log4j<span class="selector-class">.properties</span><span class="selector-class">.template</span> log4j.properties</div></pre></td></tr></table></figure></p>
+<p>编辑<code>log4j.properties</code>，修改<code>log4j.rootCategory</code>属性如下：<br><figure class="highlight routeros"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">log4j.<span class="attribute">rootCategory</span>=WARN, console</div></pre></td></tr></table></figure></p>
+<h4 id="spark-env-sh"><a href="#spark-env-sh" class="headerlink" title="spark-env.sh"></a>spark-env.sh</h4><p>Spark的环境配置文件。来源于模板文件<code>spark-env.sh.template</code><br>同样复制一份并重命名：<br><figure class="highlight css"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="selector-tag">cp</span> <span class="selector-tag">spark-env</span><span class="selector-class">.sh</span><span class="selector-class">.template</span> <span class="selector-tag">spark-env</span><span class="selector-class">.sh</span></div></pre></td></tr></table></figure></p>
+<p>编辑文件，添加或修改以下内容：</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># 指定Hadoop的配置文件目录，必须是绝对路径</span></div><div class="line"><span class="builtin-name">export</span> <span class="attribute">HADOOP_CONF_DIR</span>=/usr/hadoop/etc/hadoop</div><div class="line"></div><div class="line"><span class="comment"># 指定Spark各个Worker节点的运行最大内存</span></div><div class="line"><span class="builtin-name">export</span> <span class="attribute">SPARK_WORKER_MEMORY</span>=6g</div><div class="line"></div><div class="line"><span class="builtin-name">export</span> <span class="attribute">JAVA_HOME</span>=/usr/jdk</div></pre></td></tr></table></figure>
+<h4 id="slaves"><a href="#slaves" class="headerlink" title="slaves"></a>slaves</h4><p>同<code>Hadoop</code>中的<code>slaves</code>文件一样，可以直接拷贝过来。内容如下：<br><figure class="highlight crmsh"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="literal">master</span></div><div class="line">slave1</div><div class="line">slave2</div></pre></td></tr></table></figure></p>
+<h3 id="Spark集群的启动"><a href="#Spark集群的启动" class="headerlink" title="Spark集群的启动"></a>Spark集群的启动</h3><p>如果只想启动单机版Spark，在添加完环境变量后，无需配置可以直接执行：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#</span><span class="bash"> scala版</span></div><div class="line"><span class="meta">$</span><span class="bash"> spark-shell</span></div><div class="line"></div><div class="line"><span class="meta">#</span><span class="bash"> python版</span></div><div class="line"><span class="meta">$</span><span class="bash"> pyspark</span></div></pre></td></tr></table></figure></p>
+<p>如果想启动Spark集群，则需要在配置完成后带<code>master参数</code>执行：<br><figure class="highlight gams"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="symbol">$</span> start-<span class="keyword">all</span>.sh</div></pre></td></tr></table></figure></p>
+<p>此时集群即启动完成，正在待命。可以使用<code>spark-submit</code>命令提交程序在集群上运行：<br><figure class="highlight crmsh"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ spark-submit --<span class="keyword">master</span> <span class="title">spark</span>://<span class="literal">master</span>:<span class="number">7077</span> my_script.py</div></pre></td></tr></table></figure></p>
+<p>也可以在启动<code>spark shell</code>连接集群运行：<br><figure class="highlight crmsh"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># scala 版</span></div><div class="line">$ spark-shell <span class="keyword">master</span> <span class="title">spark</span>://<span class="literal">master</span>:<span class="number">7077</span></div><div class="line"></div><div class="line"><span class="comment"># python 版</span></div><div class="line">$ pyspark <span class="keyword">master</span> <span class="title">spark</span>://<span class="literal">master</span>:<span class="number">7077</span></div></pre></td></tr></table></figure></p>
+<p>如果要停止集群，可以执行命令来停止：<br><figure class="highlight vim"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">stop</span>-<span class="keyword">all</span>.<span class="keyword">sh</span></div></pre></td></tr></table></figure></p>
+<p>到此我们完成了<code>Spark</code>的基本配置。但是在使用过程中会遇到很多坑，因此在这里将我目前遇到的坑整理在一起：<a href="http://mrliao.cn/2017/03/16/Spark集群配置（4）：其他填坑杂项" target="_blank" rel="external">Spark集群配置（4）：其他填坑杂项</a></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Spark/" rel="tag"># Spark</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/03/16/Spark集群配置（4）：其他填坑杂项/" rel="next" title="Spark集群配置（4）：其他填坑杂项">
+                <i class="fa fa-chevron-left"></i> Spark集群配置（4）：其他填坑杂项
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/03/16/Spark集群配置（2）：安装Hadoop/" rel="prev" title="Spark集群配置（2）：安装Hadoop">
+                Spark集群配置（2）：安装Hadoop <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+          
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/uploads/avatar.jpg"
+               alt="LIAO" />
+          <p class="site-author-name" itemprop="name">LIAO</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+        
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">10</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">10</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/mrliaocn" target="_blank" title="Github">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Github
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/u/3248752395" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  Weibo
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#下载Spark"><span class="nav-number">2.</span> <span class="nav-text">下载Spark</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装Spark"><span class="nav-number">3.</span> <span class="nav-text">安装Spark</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#添加环境变量"><span class="nav-number">4.</span> <span class="nav-text">添加环境变量</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置Spark"><span class="nav-number">5.</span> <span class="nav-text">配置Spark</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#log4j-properties"><span class="nav-number">5.1.</span> <span class="nav-text">log4j.properties</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#spark-env-sh"><span class="nav-number">5.2.</span> <span class="nav-text">spark-env.sh</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#slaves"><span class="nav-number">5.3.</span> <span class="nav-text">slaves</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Spark集群的启动"><span class="nav-number">6.</span> <span class="nav-text">Spark集群的启动</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LIAO</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+  
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="cdn.bootcss.com/mathjax/2.7.1/MathJax.js"></script>
+  
+
+
+  
+
+  
+
+  
+
+
+  
+
+</body>
+</html>
